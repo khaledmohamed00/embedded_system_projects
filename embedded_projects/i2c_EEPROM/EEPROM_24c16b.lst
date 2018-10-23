@@ -1,0 +1,184 @@
+   1               		.file	"EEPROM_24c16b.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	EEPROM_read
+  12               	EEPROM_read:
+  13               	.LFB6:
+  14               		.file 1 "EEPROM_24c16b.c"
+   1:EEPROM_24c16b.c **** #define F_CPU 1000000
+   2:EEPROM_24c16b.c **** #include<avr/io.h>
+   3:EEPROM_24c16b.c **** #include<util/delay.h>
+   4:EEPROM_24c16b.c **** #include<i2c.h>
+   5:EEPROM_24c16b.c **** #include<EEPROM_24c16b.h>
+   6:EEPROM_24c16b.c **** unsigned char EEPROM_read(unsigned char address){
+  15               		.loc 1 6 0
+  16               		.cfi_startproc
+  17               	.LVL0:
+  18 0000 1F93      		push r17
+  19               	.LCFI0:
+  20               		.cfi_def_cfa_offset 3
+  21               		.cfi_offset 17, -2
+  22 0002 CF93      		push r28
+  23               	.LCFI1:
+  24               		.cfi_def_cfa_offset 4
+  25               		.cfi_offset 28, -3
+  26 0004 DF93      		push r29
+  27               	.LCFI2:
+  28               		.cfi_def_cfa_offset 5
+  29               		.cfi_offset 29, -4
+  30 0006 1F92      		push __zero_reg__
+  31               	.LCFI3:
+  32               		.cfi_def_cfa_offset 6
+  33 0008 CDB7      		in r28,__SP_L__
+  34 000a DEB7      		in r29,__SP_H__
+  35               	.LCFI4:
+  36               		.cfi_def_cfa_register 28
+  37               	/* prologue: function */
+  38               	/* frame size = 1 */
+  39               	/* stack size = 4 */
+  40               	.L__stack_usage = 4
+  41 000c 182F      		mov r17,r24
+   7:EEPROM_24c16b.c **** 
+   8:EEPROM_24c16b.c **** i2c_start();
+  42               		.loc 1 8 0
+  43 000e 00D0      		rcall i2c_start
+  44               	.LVL1:
+   9:EEPROM_24c16b.c **** i2c_write_master_nack(0xA0);
+  45               		.loc 1 9 0
+  46 0010 80EA      		ldi r24,lo8(-96)
+  47 0012 00D0      		rcall i2c_write_master_nack
+  48               	.LVL2:
+  10:EEPROM_24c16b.c **** i2c_write_master_nack(address);
+  49               		.loc 1 10 0
+  50 0014 812F      		mov r24,r17
+  51 0016 00D0      		rcall i2c_write_master_nack
+  52               	.LVL3:
+  11:EEPROM_24c16b.c **** i2c_start();
+  53               		.loc 1 11 0
+  54 0018 00D0      		rcall i2c_start
+  55               	.LVL4:
+  12:EEPROM_24c16b.c **** i2c_write_master_nack(0xA1);
+  56               		.loc 1 12 0
+  57 001a 81EA      		ldi r24,lo8(-95)
+  58 001c 00D0      		rcall i2c_write_master_nack
+  59               	.LVL5:
+  13:EEPROM_24c16b.c **** unsigned char data=i2c_read_master_nack(1);
+  60               		.loc 1 13 0
+  61 001e 81E0      		ldi r24,lo8(1)
+  62 0020 00D0      		rcall i2c_read_master_nack
+  63               	.LVL6:
+  14:EEPROM_24c16b.c **** //data=i2c_read_master_nack(1);
+  15:EEPROM_24c16b.c **** i2c_stop();
+  64               		.loc 1 15 0
+  65 0022 8983      		std Y+1,r24
+  66 0024 00D0      		rcall i2c_stop
+  67               	.LVL7:
+  16:EEPROM_24c16b.c **** 
+  17:EEPROM_24c16b.c **** return data;
+  18:EEPROM_24c16b.c **** }
+  68               		.loc 1 18 0
+  69 0026 8981      		ldd r24,Y+1
+  70               	/* epilogue start */
+  71 0028 0F90      		pop __tmp_reg__
+  72 002a DF91      		pop r29
+  73 002c CF91      		pop r28
+  74 002e 1F91      		pop r17
+  75               	.LVL8:
+  76 0030 0895      		ret
+  77               		.cfi_endproc
+  78               	.LFE6:
+  80               	.global	EEPROM_write
+  82               	EEPROM_write:
+  83               	.LFB7:
+  19:EEPROM_24c16b.c **** 
+  20:EEPROM_24c16b.c **** void EEPROM_write(unsigned char data,unsigned char address){
+  84               		.loc 1 20 0
+  85               		.cfi_startproc
+  86               	.LVL9:
+  87 0032 1F93      		push r17
+  88               	.LCFI5:
+  89               		.cfi_def_cfa_offset 3
+  90               		.cfi_offset 17, -2
+  91 0034 CF93      		push r28
+  92               	.LCFI6:
+  93               		.cfi_def_cfa_offset 4
+  94               		.cfi_offset 28, -3
+  95 0036 DF93      		push r29
+  96               	.LCFI7:
+  97               		.cfi_def_cfa_offset 5
+  98               		.cfi_offset 29, -4
+  99 0038 1F92      		push __zero_reg__
+ 100               	.LCFI8:
+ 101               		.cfi_def_cfa_offset 6
+ 102 003a CDB7      		in r28,__SP_L__
+ 103 003c DEB7      		in r29,__SP_H__
+ 104               	.LCFI9:
+ 105               		.cfi_def_cfa_register 28
+ 106               	/* prologue: function */
+ 107               	/* frame size = 1 */
+ 108               	/* stack size = 4 */
+ 109               	.L__stack_usage = 4
+ 110 003e 182F      		mov r17,r24
+  21:EEPROM_24c16b.c **** i2c_start();
+ 111               		.loc 1 21 0
+ 112 0040 6983      		std Y+1,r22
+ 113 0042 00D0      		rcall i2c_start
+ 114               	.LVL10:
+  22:EEPROM_24c16b.c **** 
+  23:EEPROM_24c16b.c **** i2c_write_master_nack(0xA0);
+ 115               		.loc 1 23 0
+ 116 0044 80EA      		ldi r24,lo8(-96)
+ 117 0046 00D0      		rcall i2c_write_master_nack
+ 118               	.LVL11:
+  24:EEPROM_24c16b.c **** i2c_write_master_nack(address);
+ 119               		.loc 1 24 0
+ 120 0048 6981      		ldd r22,Y+1
+ 121 004a 862F      		mov r24,r22
+ 122 004c 00D0      		rcall i2c_write_master_nack
+ 123               	.LVL12:
+  25:EEPROM_24c16b.c **** i2c_write_master_nack(data);
+ 124               		.loc 1 25 0
+ 125 004e 812F      		mov r24,r17
+ 126 0050 00D0      		rcall i2c_write_master_nack
+ 127               	.LVL13:
+ 128               	/* epilogue start */
+  26:EEPROM_24c16b.c **** 
+  27:EEPROM_24c16b.c **** 
+  28:EEPROM_24c16b.c **** i2c_stop();
+  29:EEPROM_24c16b.c **** 
+  30:EEPROM_24c16b.c **** 
+  31:EEPROM_24c16b.c **** }
+ 129               		.loc 1 31 0
+ 130 0052 0F90      		pop __tmp_reg__
+ 131 0054 DF91      		pop r29
+ 132 0056 CF91      		pop r28
+ 133 0058 1F91      		pop r17
+ 134               	.LVL14:
+  28:EEPROM_24c16b.c **** 
+ 135               		.loc 1 28 0
+ 136 005a 00C0      		rjmp i2c_stop
+ 137               	.LVL15:
+ 138               		.cfi_endproc
+ 139               	.LFE7:
+ 141               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 EEPROM_24c16b.c
+     /tmp/ccBKrwhz.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccBKrwhz.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccBKrwhz.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccBKrwhz.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccBKrwhz.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccBKrwhz.s:12     .text:0000000000000000 EEPROM_read
+     /tmp/ccBKrwhz.s:82     .text:0000000000000032 EEPROM_write
+
+UNDEFINED SYMBOLS
+i2c_start
+i2c_write_master_nack
+i2c_read_master_nack
+i2c_stop

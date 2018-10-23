@@ -1,0 +1,128 @@
+   1               		.file	"debug.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	USARTSendByte
+  12               	USARTSendByte:
+  13               	.LFB1:
+  14               		.file 1 "debug.c"
+   1:debug.c       **** #include <avr/io.h>
+   2:debug.c       **** #include <stdio.h>
+   3:debug.c       **** #include<debug.h>
+   4:debug.c       **** int USARTSendByte(char u8Data, FILE *stream)
+   5:debug.c       **** {
+  15               		.loc 1 5 0
+  16               		.cfi_startproc
+  17               	.LVL0:
+  18 0000 CF93      		push r28
+  19               	.LCFI0:
+  20               		.cfi_def_cfa_offset 3
+  21               		.cfi_offset 28, -2
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24               	/* stack size = 1 */
+  25               	.L__stack_usage = 1
+  26 0002 C82F      		mov r28,r24
+   6:debug.c       ****    if(u8Data == '\n')
+  27               		.loc 1 6 0
+  28 0004 8A30      		cpi r24,lo8(10)
+  29 0006 01F4      		brne .L3
+   7:debug.c       ****    {
+   8:debug.c       ****       USARTSendByte('\r', 0);
+  30               		.loc 1 8 0
+  31 0008 60E0      		ldi r22,0
+  32 000a 70E0      		ldi r23,0
+  33               	.LVL1:
+  34 000c 8DE0      		ldi r24,lo8(13)
+  35               	.LVL2:
+  36 000e 00D0      		rcall USARTSendByte
+  37               	.LVL3:
+  38               	.L3:
+   9:debug.c       ****    }
+  10:debug.c       **** //wait while previous byte is completed
+  11:debug.c       **** while(!(UCSRA&(1<<UDRE))){};
+  39               		.loc 1 11 0
+  40 0010 5D9B      		sbis 0xb,5
+  41 0012 00C0      		rjmp .L3
+  12:debug.c       **** // Transmit data
+  13:debug.c       **** UDR = u8Data;
+  42               		.loc 1 13 0
+  43 0014 CCB9      		out 0xc,r28
+  14:debug.c       **** return 0;
+  15:debug.c       **** }
+  44               		.loc 1 15 0
+  45 0016 80E0      		ldi r24,0
+  46 0018 90E0      		ldi r25,0
+  47               	/* epilogue start */
+  48 001a CF91      		pop r28
+  49               	.LVL4:
+  50 001c 0895      		ret
+  51               		.cfi_endproc
+  52               	.LFE1:
+  54               	.global	USARTReceiveByte
+  56               	USARTReceiveByte:
+  57               	.LFB2:
+  16:debug.c       **** 
+  17:debug.c       **** int USARTReceiveByte(FILE *stream)
+  18:debug.c       **** {
+  58               		.loc 1 18 0
+  59               		.cfi_startproc
+  60               	.LVL5:
+  61 001e CF93      		push r28
+  62               	.LCFI1:
+  63               		.cfi_def_cfa_offset 3
+  64               		.cfi_offset 28, -2
+  65               	/* prologue: function */
+  66               	/* frame size = 0 */
+  67               	/* stack size = 1 */
+  68               	.L__stack_usage = 1
+  69               	.L8:
+  19:debug.c       **** uint8_t u8Data;
+  20:debug.c       **** // Wait for byte to be received
+  21:debug.c       **** while(!(UCSRA&(1<<RXC))){};
+  70               		.loc 1 21 0
+  71 0020 5F9B      		sbis 0xb,7
+  72 0022 00C0      		rjmp .L8
+  22:debug.c       **** u8Data=UDR;
+  73               		.loc 1 22 0
+  74 0024 CCB1      		in r28,0xc
+  75               	.LVL6:
+  23:debug.c       **** //echo input data
+  24:debug.c       **** USARTSendByte(u8Data,stream);
+  76               		.loc 1 24 0
+  77 0026 BC01      		movw r22,r24
+  78 0028 8C2F      		mov r24,r28
+  79               	.LVL7:
+  80 002a 00D0      		rcall USARTSendByte
+  81               	.LVL8:
+  25:debug.c       **** // Return received data
+  26:debug.c       **** return u8Data;
+  27:debug.c       **** }
+  82               		.loc 1 27 0
+  83 002c 8C2F      		mov r24,r28
+  84 002e 90E0      		ldi r25,0
+  85               	/* epilogue start */
+  86 0030 CF91      		pop r28
+  87               	.LVL9:
+  88 0032 0895      		ret
+  89               		.cfi_endproc
+  90               	.LFE2:
+  92               	.Letext0:
+  93               		.file 2 "/usr/lib/avr/include/stdio.h"
+  94               		.file 3 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 debug.c
+     /tmp/ccrO13a5.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccrO13a5.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccrO13a5.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccrO13a5.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccrO13a5.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccrO13a5.s:12     .text:0000000000000000 USARTSendByte
+     /tmp/ccrO13a5.s:56     .text:000000000000001e USARTReceiveByte
+
+NO UNDEFINED SYMBOLS

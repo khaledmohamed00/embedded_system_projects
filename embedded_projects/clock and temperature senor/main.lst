@@ -1,0 +1,951 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.rodata.str1.1,"aMS",@progbits,1
+  11               	.LC0:
+  12 0000 203A 2000 		.string	" : "
+  13               		.section	.text.startup,"ax",@progbits
+  14               	.global	main
+  16               	main:
+  17               	.LFB6:
+  18               		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        ****  * GccApplication7.c
+   3:main.c        ****  *
+   4:main.c        ****  * Created: 22-04-2017 5:53:14 PM
+   5:main.c        ****  * Author : Admin
+   6:main.c        ****  */ 
+   7:main.c        **** #define F_CPU 1000000ul
+   8:main.c        **** //#define F_CPU 11059200
+   9:main.c        **** #include <avr/io.h>
+  10:main.c        **** #include "adc.h"
+  11:main.c        **** #include "lcdlib.h"
+  12:main.c        **** #include <util/delay.h>
+  13:main.c        **** #include <avr/interrupt.h>
+  14:main.c        **** static volatile int SEC =0;
+  15:main.c        **** static volatile int MIN =0;
+  16:main.c        **** static volatile int HOU =0;
+  17:main.c        **** #define START_TIMER1 TCCR1B |= (1<<CS0)|(1<<CS2)
+  18:main.c        **** #define STOP_TIMER1  TCCR1B &= 0B11111000
+  19:main.c        **** int main(void)
+  20:main.c        **** {//int SEC =0;
+  19               		.loc 1 20 0
+  20               		.cfi_startproc
+  21               	/* prologue: function */
+  22               	/* frame size = 0 */
+  23               	/* stack size = 0 */
+  24               	.L__stack_usage = 0
+  21:main.c        **** 	/*int value;
+  22:main.c        **** 	LCD_Init();
+  23:main.c        **** 	adc_init();
+  24:main.c        ****   
+  25:main.c        ****    int history =0;
+  26:main.c        ****     while (1) 
+  27:main.c        ****     {
+  28:main.c        **** //LCD_Init();
+  29:main.c        **** 	//_LCD_CLR();
+  30:main.c        **** 	//_delay_ms(100);
+  31:main.c        **** 		//lcd_write_int(0);
+  32:main.c        **** 		//lcd_write_string("Temp= ")	;
+  33:main.c        **** 		//adc_init(); 
+  34:main.c        **** 		//lcd_write_int((adc_read(0x0)/2)-1);
+  35:main.c        **** 		//value = ((adc_read(0)*500.0)/1024.0);
+  36:main.c        **** 		
+  37:main.c        **** 		value = ((adc_read(0)*4.8828125)/10);
+  38:main.c        **** 		if(value!=history)
+  39:main.c        **** 		{ history=value;
+  40:main.c        **** 		LCD_CmdWrite(0x0E);	      // Display ON cuRSor ON
+  41:main.c        **** 		LCD_CmdWrite(0x01);	      // Clear the LCD
+  42:main.c        **** 		LCD_CmdWrite(0x80);
+  43:main.c        **** 		lcd_write_string("Temp= ")	;
+  44:main.c        **** 		//lcd_write_int(value);
+  45:main.c        **** 		LCD_Integer(value);
+  46:main.c        **** 		//LCD_DataWrite(value);
+  47:main.c        **** 		lcd_write_string(" c ");
+  48:main.c        **** 	//LCD_CmdWrite(0x01);
+  49:main.c        **** 		}
+  50:main.c        **** 	}*/
+  51:main.c        **** DDRD&=~(1<<DDD2);
+  25               		.loc 1 51 0
+  26 0000 5298      		cbi 0xa,2
+  52:main.c        **** PORTD|=(1<<PORTD2);
+  27               		.loc 1 52 0
+  28 0002 5A9A      		sbi 0xb,2
+  53:main.c        **** EICRA|=(1<<ISC00);
+  29               		.loc 1 53 0
+  30 0004 8091 6900 		lds r24,105
+  31 0008 8160      		ori r24,lo8(1)
+  32 000a 8093 6900 		sts 105,r24
+  54:main.c        **** EIMSK|=(1<<INT0);	
+  33               		.loc 1 54 0
+  34 000e E89A      		sbi 0x1d,0
+  55:main.c        **** 	sei();
+  35               		.loc 1 55 0
+  36               	/* #APP */
+  37               	 ;  55 "main.c" 1
+  38 0010 7894      		sei
+  39               	 ;  0 "" 2
+  56:main.c        **** 	DDRB=0xf0;
+  40               		.loc 1 56 0
+  41               	/* #NOAPP */
+  42 0012 80EF      		ldi r24,lo8(-16)
+  43 0014 84B9      		out 0x4,r24
+  57:main.c        **** 	PORTB=0x0f;
+  44               		.loc 1 57 0
+  45 0016 8FE0      		ldi r24,lo8(15)
+  46 0018 85B9      		out 0x5,r24
+  58:main.c        **** LCD_Init();
+  47               		.loc 1 58 0
+  48 001a 0E94 0000 		call LCD_Init
+  49               	.LVL0:
+  59:main.c        **** TCCR1B |=(1<<CS12)|(1<<CS10)|(1<<WGM12);// setting prescale and CTC mode
+  50               		.loc 1 59 0
+  51 001e 8091 8100 		lds r24,129
+  52 0022 8D60      		ori r24,lo8(13)
+  53 0024 8093 8100 		sts 129,r24
+  60:main.c        **** 
+  61:main.c        **** //OCR1A=10800;//setting compare value equal to counter clock frequency to get an interrupt every se
+  62:main.c        **** OCR1A=0x3d0;
+  54               		.loc 1 62 0
+  55 0028 80ED      		ldi r24,lo8(-48)
+  56 002a 93E0      		ldi r25,lo8(3)
+  57 002c 9093 8900 		sts 136+1,r25
+  58 0030 8093 8800 		sts 136,r24
+  63:main.c        **** //OCR1A=0xff;
+  64:main.c        **** 
+  65:main.c        **** //sei();// enabling global interrupts
+  66:main.c        **** //int val=TCNT0_1;
+  67:main.c        **** TIMSK1 |=(1<<OCIE1A);//compare match interrupt enable
+  59               		.loc 1 67 0
+  60 0034 8091 6F00 		lds r24,111
+  61 0038 8260      		ori r24,lo8(2)
+  62 003a 8093 6F00 		sts 111,r24
+  68:main.c        **** while(1)
+  69:main.c        **** { if ((PINB & (1<<PINB0))==0)
+  70:main.c        **** 	{_delay_ms(100);
+  71:main.c        **** 		if ((PINB & (1<<PINB0))==0)
+  72:main.c        **** 		{
+  73:main.c        **** 			
+  74:main.c        **** 		
+  75:main.c        **** 		MIN=(MIN+1)%60;
+  63               		.loc 1 75 0
+  64 003e CCE3      		ldi r28,lo8(60)
+  65 0040 D0E0      		ldi r29,0
+  76:main.c        **** 		}
+  77:main.c        **** 	}
+  78:main.c        **** 	if ((PINB & (1<<PINB1))==0)
+  79:main.c        **** 	{_delay_ms(100);
+  80:main.c        **** 		if ((PINB & (1<<PINB1))==0)
+  81:main.c        **** 		{
+  82:main.c        **** 			
+  83:main.c        **** 			
+  84:main.c        **** 		HOU=(HOU+1)%24;
+  66               		.loc 1 84 0
+  67 0042 08E1      		ldi r16,lo8(24)
+  68 0044 10E0      		ldi r17,0
+  69               	.L14:
+  69:main.c        **** 	{_delay_ms(100);
+  70               		.loc 1 69 0
+  71 0046 1899      		sbic 0x3,0
+  72 0048 00C0      		rjmp .L3
+  73               	.LVL1:
+  74               	.LBB14:
+  75               	.LBB15:
+  76               		.file 2 "/usr/lib/avr/include/util/delay.h"
+   1:/usr/lib/avr/include/util/delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:/usr/lib/avr/include/util/delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:/usr/lib/avr/include/util/delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:/usr/lib/avr/include/util/delay.h ****    All rights reserved.
+   5:/usr/lib/avr/include/util/delay.h **** 
+   6:/usr/lib/avr/include/util/delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:/usr/lib/avr/include/util/delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:/usr/lib/avr/include/util/delay.h **** 
+   9:/usr/lib/avr/include/util/delay.h ****    * Redistributions of source code must retain the above copyright
+  10:/usr/lib/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:/usr/lib/avr/include/util/delay.h **** 
+  12:/usr/lib/avr/include/util/delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:/usr/lib/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:/usr/lib/avr/include/util/delay.h ****      the documentation and/or other materials provided with the
+  15:/usr/lib/avr/include/util/delay.h ****      distribution.
+  16:/usr/lib/avr/include/util/delay.h **** 
+  17:/usr/lib/avr/include/util/delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:/usr/lib/avr/include/util/delay.h ****      contributors may be used to endorse or promote products derived
+  19:/usr/lib/avr/include/util/delay.h ****      from this software without specific prior written permission.
+  20:/usr/lib/avr/include/util/delay.h **** 
+  21:/usr/lib/avr/include/util/delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:/usr/lib/avr/include/util/delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:/usr/lib/avr/include/util/delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:/usr/lib/avr/include/util/delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:/usr/lib/avr/include/util/delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:/usr/lib/avr/include/util/delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:/usr/lib/avr/include/util/delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:/usr/lib/avr/include/util/delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:/usr/lib/avr/include/util/delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:/usr/lib/avr/include/util/delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:/usr/lib/avr/include/util/delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:/usr/lib/avr/include/util/delay.h **** 
+  33:/usr/lib/avr/include/util/delay.h **** /* $Id$ */
+  34:/usr/lib/avr/include/util/delay.h **** 
+  35:/usr/lib/avr/include/util/delay.h **** #ifndef _UTIL_DELAY_H_
+  36:/usr/lib/avr/include/util/delay.h **** #define _UTIL_DELAY_H_ 1
+  37:/usr/lib/avr/include/util/delay.h **** 
+  38:/usr/lib/avr/include/util/delay.h **** #ifndef __HAS_DELAY_CYCLES
+  39:/usr/lib/avr/include/util/delay.h **** #define __HAS_DELAY_CYCLES 1
+  40:/usr/lib/avr/include/util/delay.h **** #endif
+  41:/usr/lib/avr/include/util/delay.h **** 
+  42:/usr/lib/avr/include/util/delay.h **** #include <inttypes.h>
+  43:/usr/lib/avr/include/util/delay.h **** #include <util/delay_basic.h>
+  44:/usr/lib/avr/include/util/delay.h **** #include <math.h>
+  45:/usr/lib/avr/include/util/delay.h **** 
+  46:/usr/lib/avr/include/util/delay.h **** /** \file */
+  47:/usr/lib/avr/include/util/delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  48:/usr/lib/avr/include/util/delay.h ****     \code
+  49:/usr/lib/avr/include/util/delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  50:/usr/lib/avr/include/util/delay.h ****     //#define F_CPU 14.7456E6
+  51:/usr/lib/avr/include/util/delay.h ****     #include <util/delay.h>
+  52:/usr/lib/avr/include/util/delay.h ****     \endcode
+  53:/usr/lib/avr/include/util/delay.h **** 
+  54:/usr/lib/avr/include/util/delay.h ****     \note As an alternative method, it is possible to pass the
+  55:/usr/lib/avr/include/util/delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  56:/usr/lib/avr/include/util/delay.h ****     Obviously, in that case, no \c \#define statement should be
+  57:/usr/lib/avr/include/util/delay.h ****     used.
+  58:/usr/lib/avr/include/util/delay.h **** 
+  59:/usr/lib/avr/include/util/delay.h ****     The functions in this header file are wrappers around the basic
+  60:/usr/lib/avr/include/util/delay.h ****     busy-wait functions from <util/delay_basic.h>.  They are meant as
+  61:/usr/lib/avr/include/util/delay.h ****     convenience functions where actual time values can be specified
+  62:/usr/lib/avr/include/util/delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  63:/usr/lib/avr/include/util/delay.h ****     that compile-time constant expressions will be eliminated by
+  64:/usr/lib/avr/include/util/delay.h ****     compiler optimization so floating-point expressions can be used
+  65:/usr/lib/avr/include/util/delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  66:/usr/lib/avr/include/util/delay.h ****     frequency passed by the macro F_CPU.
+  67:/usr/lib/avr/include/util/delay.h **** 
+  68:/usr/lib/avr/include/util/delay.h ****     \note In order for these functions to work as intended, compiler
+  69:/usr/lib/avr/include/util/delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  70:/usr/lib/avr/include/util/delay.h ****     <em>must</em> be an expression that is a known constant at
+  71:/usr/lib/avr/include/util/delay.h ****     compile-time.  If these requirements are not met, the resulting
+  72:/usr/lib/avr/include/util/delay.h ****     delay will be much longer (and basically unpredictable), and
+  73:/usr/lib/avr/include/util/delay.h ****     applications that otherwise do not use floating-point calculations
+  74:/usr/lib/avr/include/util/delay.h ****     will experience severe code bloat by the floating-point library
+  75:/usr/lib/avr/include/util/delay.h ****     routines linked into the application.
+  76:/usr/lib/avr/include/util/delay.h **** 
+  77:/usr/lib/avr/include/util/delay.h ****     The functions available allow the specification of microsecond, and
+  78:/usr/lib/avr/include/util/delay.h ****     millisecond delays directly, using the application-supplied macro
+  79:/usr/lib/avr/include/util/delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  80:/usr/lib/avr/include/util/delay.h **** 
+  81:/usr/lib/avr/include/util/delay.h **** */
+  82:/usr/lib/avr/include/util/delay.h **** 
+  83:/usr/lib/avr/include/util/delay.h **** #if !defined(__DOXYGEN__)
+  84:/usr/lib/avr/include/util/delay.h **** static inline void _delay_us(double __us) __attribute__((always_inline));
+  85:/usr/lib/avr/include/util/delay.h **** static inline void _delay_ms(double __ms) __attribute__((always_inline));
+  86:/usr/lib/avr/include/util/delay.h **** #endif
+  87:/usr/lib/avr/include/util/delay.h **** 
+  88:/usr/lib/avr/include/util/delay.h **** #ifndef F_CPU
+  89:/usr/lib/avr/include/util/delay.h **** /* prevent compiler error by supplying a default */
+  90:/usr/lib/avr/include/util/delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  91:/usr/lib/avr/include/util/delay.h **** # define F_CPU 1000000UL
+  92:/usr/lib/avr/include/util/delay.h **** #endif
+  93:/usr/lib/avr/include/util/delay.h **** 
+  94:/usr/lib/avr/include/util/delay.h **** #ifndef __OPTIMIZE__
+  95:/usr/lib/avr/include/util/delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+  96:/usr/lib/avr/include/util/delay.h **** #endif
+  97:/usr/lib/avr/include/util/delay.h **** 
+  98:/usr/lib/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+  99:/usr/lib/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 100:/usr/lib/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 101:/usr/lib/avr/include/util/delay.h **** #  include <math.h>
+ 102:/usr/lib/avr/include/util/delay.h **** #endif
+ 103:/usr/lib/avr/include/util/delay.h **** 
+ 104:/usr/lib/avr/include/util/delay.h **** /**
+ 105:/usr/lib/avr/include/util/delay.h ****    \ingroup util_delay
+ 106:/usr/lib/avr/include/util/delay.h **** 
+ 107:/usr/lib/avr/include/util/delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 108:/usr/lib/avr/include/util/delay.h **** 
+ 109:/usr/lib/avr/include/util/delay.h ****    The macro F_CPU is supposed to be defined to a
+ 110:/usr/lib/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 111:/usr/lib/avr/include/util/delay.h **** 
+ 112:/usr/lib/avr/include/util/delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 113:/usr/lib/avr/include/util/delay.h **** 
+ 114:/usr/lib/avr/include/util/delay.h ****    When the user request delay which exceed the maximum possible one,
+ 115:/usr/lib/avr/include/util/delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 116:/usr/lib/avr/include/util/delay.h ****    mode _delay_ms() will work with a resolution of 1/10 ms, providing
+ 117:/usr/lib/avr/include/util/delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 118:/usr/lib/avr/include/util/delay.h ****    user will not be informed about decreased resolution.
+ 119:/usr/lib/avr/include/util/delay.h **** 
+ 120:/usr/lib/avr/include/util/delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles(unsigned long)
+ 121:/usr/lib/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 122:/usr/lib/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflows results in
+ 123:/usr/lib/avr/include/util/delay.h ****    no delay i.e., 0ms.
+ 124:/usr/lib/avr/include/util/delay.h **** 
+ 125:/usr/lib/avr/include/util/delay.h ****    Conversion of __us into clock cycles may not always result in integer.
+ 126:/usr/lib/avr/include/util/delay.h ****    By default, the clock cycles rounded up to next integer. This ensures that
+ 127:/usr/lib/avr/include/util/delay.h ****    the user gets atleast __us microseconds of delay.
+ 128:/usr/lib/avr/include/util/delay.h **** 
+ 129:/usr/lib/avr/include/util/delay.h ****    Alternatively, user can define __DELAY_ROUND_DOWN__ and __DELAY_ROUND_CLOSEST__
+ 130:/usr/lib/avr/include/util/delay.h ****    to round down and round to closest integer.
+ 131:/usr/lib/avr/include/util/delay.h **** 
+ 132:/usr/lib/avr/include/util/delay.h ****    Note: The new implementation of _delay_ms(double __ms) with 
+ 133:/usr/lib/avr/include/util/delay.h ****     __builtin_avr_delay_cycles(unsigned long) support is not backward compatible. 
+ 134:/usr/lib/avr/include/util/delay.h ****    User can define __DELAY_BACKWARD_COMPATIBLE__ to get a backward compatible delay.
+ 135:/usr/lib/avr/include/util/delay.h ****    Also, the backward compatible
+ 136:/usr/lib/avr/include/util/delay.h ****    algorithm will be chosen if the code is compiled in a <em>freestanding
+ 137:/usr/lib/avr/include/util/delay.h ****    environment</em> (GCC option \c -ffreestanding), as the math functions
+ 138:/usr/lib/avr/include/util/delay.h ****    required for rounding are not available to the compiler then.
+ 139:/usr/lib/avr/include/util/delay.h **** 
+ 140:/usr/lib/avr/include/util/delay.h ****  */
+ 141:/usr/lib/avr/include/util/delay.h **** void
+ 142:/usr/lib/avr/include/util/delay.h **** _delay_ms(double __ms)
+ 143:/usr/lib/avr/include/util/delay.h **** {
+ 144:/usr/lib/avr/include/util/delay.h **** 	double __tmp ; 
+ 145:/usr/lib/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 146:/usr/lib/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 147:/usr/lib/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 148:/usr/lib/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 149:/usr/lib/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 150:/usr/lib/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 151:/usr/lib/avr/include/util/delay.h **** 
+ 152:/usr/lib/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 153:/usr/lib/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 154:/usr/lib/avr/include/util/delay.h **** 
+ 155:/usr/lib/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 156:/usr/lib/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 157:/usr/lib/avr/include/util/delay.h **** 
+ 158:/usr/lib/avr/include/util/delay.h **** 	#else
+ 159:/usr/lib/avr/include/util/delay.h **** 		//round up by default
+ 160:/usr/lib/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 161:/usr/lib/avr/include/util/delay.h **** 	#endif
+ 162:/usr/lib/avr/include/util/delay.h **** 
+ 163:/usr/lib/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+  77               		.loc 2 163 0
+  78 004a 87EA      		ldi r24,lo8(24999)
+  79 004c 91E6      		ldi r25,hi8(24999)
+  80 004e 0197      	1:	sbiw r24,1
+  81 0050 01F4      		brne 1b
+  82 0052 00C0      		rjmp .
+  83 0054 0000      		nop
+  84               	.LBE15:
+  85               	.LBE14:
+  71:main.c        **** 		{
+  86               		.loc 1 71 0
+  87 0056 1899      		sbic 0x3,0
+  88 0058 00C0      		rjmp .L3
+  75:main.c        **** 		}
+  89               		.loc 1 75 0
+  90 005a 8091 0000 		lds r24,MIN
+  91 005e 9091 0000 		lds r25,MIN+1
+  92 0062 0196      		adiw r24,1
+  93 0064 BE01      		movw r22,r28
+  94 0066 0E94 0000 		call __divmodhi4
+  95 006a 9093 0000 		sts MIN+1,r25
+  96 006e 8093 0000 		sts MIN,r24
+  97               	.LVL2:
+  98               	.L3:
+  78:main.c        **** 	{_delay_ms(100);
+  99               		.loc 1 78 0
+ 100 0072 1999      		sbic 0x3,1
+ 101 0074 00C0      		rjmp .L6
+ 102               	.LVL3:
+ 103               	.LBB16:
+ 104               	.LBB17:
+ 105               		.loc 2 163 0
+ 106 0076 87EA      		ldi r24,lo8(24999)
+ 107 0078 91E6      		ldi r25,hi8(24999)
+ 108 007a 0197      	1:	sbiw r24,1
+ 109 007c 01F4      		brne 1b
+ 110 007e 00C0      		rjmp .
+ 111 0080 0000      		nop
+ 112               	.LBE17:
+ 113               	.LBE16:
+  80:main.c        **** 		{
+ 114               		.loc 1 80 0
+ 115 0082 1999      		sbic 0x3,1
+ 116 0084 00C0      		rjmp .L6
+ 117               		.loc 1 84 0
+ 118 0086 8091 0000 		lds r24,HOU
+ 119 008a 9091 0000 		lds r25,HOU+1
+ 120 008e 0196      		adiw r24,1
+ 121 0090 B801      		movw r22,r16
+ 122 0092 0E94 0000 		call __divmodhi4
+ 123 0096 9093 0000 		sts HOU+1,r25
+ 124 009a 8093 0000 		sts HOU,r24
+ 125               	.LVL4:
+ 126               	.L6:
+  85:main.c        **** 	}
+  86:main.c        **** 	}
+  87:main.c        **** 	if ((PINB & (1<<PINB2))==0)
+ 127               		.loc 1 87 0
+ 128 009e 1A99      		sbic 0x3,2
+ 129 00a0 00C0      		rjmp .L9
+  88:main.c        **** 	{ if(MIN>0)
+ 130               		.loc 1 88 0
+ 131 00a2 8091 0000 		lds r24,MIN
+ 132 00a6 9091 0000 		lds r25,MIN+1
+ 133 00aa 1816      		cp __zero_reg__,r24
+ 134 00ac 1906      		cpc __zero_reg__,r25
+ 135 00ae 04F4      		brge .L9
+ 136               	.LVL5:
+ 137               	.LBB18:
+ 138               	.LBB19:
+ 139               		.loc 2 163 0
+ 140 00b0 87EA      		ldi r24,lo8(24999)
+ 141 00b2 91E6      		ldi r25,hi8(24999)
+ 142 00b4 0197      	1:	sbiw r24,1
+ 143 00b6 01F4      		brne 1b
+ 144 00b8 00C0      		rjmp .
+ 145 00ba 0000      		nop
+ 146               	.LBE19:
+ 147               	.LBE18:
+  89:main.c        **** 		{_delay_ms(100);
+  90:main.c        **** 			if ((PINB & (1<<PINB2))==0)
+ 148               		.loc 1 90 0
+ 149 00bc 1A99      		sbic 0x3,2
+ 150 00be 00C0      		rjmp .L9
+  91:main.c        **** 			
+  92:main.c        **** 			{
+  93:main.c        **** 				
+  94:main.c        **** 				
+  95:main.c        **** 		MIN=(MIN-1)%60;
+ 151               		.loc 1 95 0
+ 152 00c0 8091 0000 		lds r24,MIN
+ 153 00c4 9091 0000 		lds r25,MIN+1
+ 154 00c8 0197      		sbiw r24,1
+ 155 00ca BE01      		movw r22,r28
+ 156 00cc 0E94 0000 		call __divmodhi4
+ 157 00d0 9093 0000 		sts MIN+1,r25
+ 158 00d4 8093 0000 		sts MIN,r24
+ 159               	.LVL6:
+ 160               	.L9:
+  96:main.c        **** 			}
+  97:main.c        **** 	}
+  98:main.c        **** 	}
+  99:main.c        **** 	if ((PINB & (1<<PINB3))==0)
+ 161               		.loc 1 99 0
+ 162 00d8 1B99      		sbic 0x3,3
+ 163 00da 00C0      		rjmp .L12
+ 100:main.c        **** 	{ if(HOU>0)
+ 164               		.loc 1 100 0
+ 165 00dc 8091 0000 		lds r24,HOU
+ 166 00e0 9091 0000 		lds r25,HOU+1
+ 167 00e4 1816      		cp __zero_reg__,r24
+ 168 00e6 1906      		cpc __zero_reg__,r25
+ 169 00e8 04F4      		brge .L12
+ 170               	.LVL7:
+ 171               	.LBB20:
+ 172               	.LBB21:
+ 173               		.loc 2 163 0
+ 174 00ea 87EA      		ldi r24,lo8(24999)
+ 175 00ec 91E6      		ldi r25,hi8(24999)
+ 176 00ee 0197      	1:	sbiw r24,1
+ 177 00f0 01F4      		brne 1b
+ 178 00f2 00C0      		rjmp .
+ 179 00f4 0000      		nop
+ 180               	.LBE21:
+ 181               	.LBE20:
+ 101:main.c        **** 		{_delay_ms(100);
+ 102:main.c        **** 			if ((PINB & (1<<PINB3))==0)
+ 182               		.loc 1 102 0
+ 183 00f6 1B99      		sbic 0x3,3
+ 184 00f8 00C0      		rjmp .L12
+ 103:main.c        **** 			{
+ 104:main.c        **** 				
+ 105:main.c        **** 				
+ 106:main.c        **** 		HOU=(HOU-1)%24;
+ 185               		.loc 1 106 0
+ 186 00fa 8091 0000 		lds r24,HOU
+ 187 00fe 9091 0000 		lds r25,HOU+1
+ 188 0102 0197      		sbiw r24,1
+ 189 0104 B801      		movw r22,r16
+ 190 0106 0E94 0000 		call __divmodhi4
+ 191 010a 9093 0000 		sts HOU+1,r25
+ 192 010e 8093 0000 		sts HOU,r24
+ 193               	.LVL8:
+ 194               	.L12:
+ 107:main.c        **** 			}
+ 108:main.c        **** 		}
+ 109:main.c        **** 	}
+ 110:main.c        **** 	//LCD_Init();
+ 111:main.c        **** 	 //LCD_CmdWrite(0x28);
+ 112:main.c        **** 	 LCD_CmdWrite(0x0E);	      // Display ON cuRSor ON
+ 195               		.loc 1 112 0
+ 196 0112 8EE0      		ldi r24,lo8(14)
+ 197 0114 0E94 0000 		call LCD_CmdWrite
+ 198               	.LVL9:
+ 113:main.c        **** 	 LCD_CmdWrite(0x01);	      // Clear the LCD
+ 199               		.loc 1 113 0
+ 200 0118 81E0      		ldi r24,lo8(1)
+ 201 011a 0E94 0000 		call LCD_CmdWrite
+ 202               	.LVL10:
+ 114:main.c        **** 	 LCD_CmdWrite(0x80);
+ 203               		.loc 1 114 0
+ 204 011e 80E8      		ldi r24,lo8(-128)
+ 205 0120 0E94 0000 		call LCD_CmdWrite
+ 206               	.LVL11:
+ 115:main.c        **** 	//LCD_CmdWrite(0x1C);
+ 116:main.c        **** 	//LCD_CmdWrite(0x08);
+ 117:main.c        **** 	
+ 118:main.c        **** 	LCD_Integer( HOU);
+ 207               		.loc 1 118 0
+ 208 0124 8091 0000 		lds r24,HOU
+ 209 0128 9091 0000 		lds r25,HOU+1
+ 210 012c 0E94 0000 		call LCD_Integer
+ 211               	.LVL12:
+ 119:main.c        **** 	lcd_write_string(" : ")	;
+ 212               		.loc 1 119 0
+ 213 0130 80E0      		ldi r24,lo8(.LC0)
+ 214 0132 90E0      		ldi r25,hi8(.LC0)
+ 215 0134 0E94 0000 		call lcd_write_string
+ 216               	.LVL13:
+ 120:main.c        **** 	//lcd_write_int(SEC);
+ 121:main.c        ****  //LCD_CmdWrite(0x80 + 3);	
+ 122:main.c        **** //lcd_write_int(SEC);
+ 123:main.c        **** LCD_Integer(MIN);
+ 217               		.loc 1 123 0
+ 218 0138 8091 0000 		lds r24,MIN
+ 219 013c 9091 0000 		lds r25,MIN+1
+ 220 0140 0E94 0000 		call LCD_Integer
+ 221               	.LVL14:
+ 124:main.c        **** // LCD_CmdWrite(0x80 + 3);
+ 125:main.c        ****   lcd_write_string(" : ")	;
+ 222               		.loc 1 125 0
+ 223 0144 80E0      		ldi r24,lo8(.LC0)
+ 224 0146 90E0      		ldi r25,hi8(.LC0)
+ 225 0148 0E94 0000 		call lcd_write_string
+ 226               	.LVL15:
+ 126:main.c        **** 
+ 127:main.c        **** LCD_Integer( SEC);
+ 227               		.loc 1 127 0
+ 228 014c 8091 0000 		lds r24,SEC
+ 229 0150 9091 0000 		lds r25,SEC+1
+ 230 0154 0E94 0000 		call LCD_Integer
+ 231               	.LVL16:
+ 232               	.LBB22:
+ 233               	.LBB23:
+ 234               		.loc 2 163 0
+ 235 0158 85EA      		ldi r24,lo8(3749)
+ 236 015a 9EE0      		ldi r25,hi8(3749)
+ 237 015c 0197      	1:	sbiw r24,1
+ 238 015e 01F4      		brne 1b
+ 239 0160 00C0      		rjmp .
+ 240 0162 0000      		nop
+ 241 0164 00C0      		rjmp .L14
+ 242               	.LBE23:
+ 243               	.LBE22:
+ 244               		.cfi_endproc
+ 245               	.LFE6:
+ 247               		.text
+ 248               	.global	__vector_11
+ 250               	__vector_11:
+ 251               	.LFB7:
+ 128:main.c        **** _delay_ms(15);
+ 129:main.c        **** }
+ 130:main.c        **** }
+ 131:main.c        **** 
+ 132:main.c        **** ISR(TIMER1_COMPA_vect) //loop to be executed on counter compare match
+ 133:main.c        **** 
+ 134:main.c        **** {
+ 252               		.loc 1 134 0
+ 253               		.cfi_startproc
+ 254 0000 1F92      		push r1
+ 255               	.LCFI0:
+ 256               		.cfi_def_cfa_offset 3
+ 257               		.cfi_offset 1, -2
+ 258 0002 0F92      		push r0
+ 259               	.LCFI1:
+ 260               		.cfi_def_cfa_offset 4
+ 261               		.cfi_offset 0, -3
+ 262 0004 0FB6      		in r0,__SREG__
+ 263 0006 0F92      		push r0
+ 264 0008 1124      		clr __zero_reg__
+ 265 000a 8F93      		push r24
+ 266               	.LCFI2:
+ 267               		.cfi_def_cfa_offset 5
+ 268               		.cfi_offset 24, -4
+ 269 000c 9F93      		push r25
+ 270               	.LCFI3:
+ 271               		.cfi_def_cfa_offset 6
+ 272               		.cfi_offset 25, -5
+ 273               	/* prologue: Signal */
+ 274               	/* frame size = 0 */
+ 275               	/* stack size = 5 */
+ 276               	.L__stack_usage = 5
+ 135:main.c        **** 
+ 136:main.c        **** 	if (SEC<60)
+ 277               		.loc 1 136 0
+ 278 000e 8091 0000 		lds r24,SEC
+ 279 0012 9091 0000 		lds r25,SEC+1
+ 280 0016 CC97      		sbiw r24,60
+ 281 0018 04F4      		brge .L17
+ 137:main.c        **** 
+ 138:main.c        **** 	{
+ 139:main.c        **** 
+ 140:main.c        **** 		SEC++;
+ 282               		.loc 1 140 0
+ 283 001a 8091 0000 		lds r24,SEC
+ 284 001e 9091 0000 		lds r25,SEC+1
+ 285 0022 0196      		adiw r24,1
+ 286 0024 9093 0000 		sts SEC+1,r25
+ 287 0028 8093 0000 		sts SEC,r24
+ 288               	.L17:
+ 141:main.c        **** 
+ 142:main.c        **** 	}
+ 143:main.c        ****  if (SEC==60)
+ 289               		.loc 1 143 0
+ 290 002c 8091 0000 		lds r24,SEC
+ 291 0030 9091 0000 		lds r25,SEC+1
+ 292 0034 CC97      		sbiw r24,60
+ 293 0036 01F4      		brne .L18
+ 144:main.c        ****  {
+ 145:main.c        **** 	 if (MIN<60)
+ 294               		.loc 1 145 0
+ 295 0038 8091 0000 		lds r24,MIN
+ 296 003c 9091 0000 		lds r25,MIN+1
+ 297 0040 CC97      		sbiw r24,60
+ 298 0042 04F4      		brge .L19
+ 146:main.c        **** 	 {
+ 147:main.c        **** 		 MIN++;
+ 299               		.loc 1 147 0
+ 300 0044 8091 0000 		lds r24,MIN
+ 301 0048 9091 0000 		lds r25,MIN+1
+ 302 004c 0196      		adiw r24,1
+ 303 004e 9093 0000 		sts MIN+1,r25
+ 304 0052 8093 0000 		sts MIN,r24
+ 305               	.L19:
+ 148:main.c        **** 	 }
+ 149:main.c        **** 	 SEC=0;
+ 306               		.loc 1 149 0
+ 307 0056 1092 0000 		sts SEC+1,__zero_reg__
+ 308 005a 1092 0000 		sts SEC,__zero_reg__
+ 309               	.L18:
+ 150:main.c        ****  }
+ 151:main.c        ****  if (MIN==60)
+ 310               		.loc 1 151 0
+ 311 005e 8091 0000 		lds r24,MIN
+ 312 0062 9091 0000 		lds r25,MIN+1
+ 313 0066 CC97      		sbiw r24,60
+ 314 0068 01F4      		brne .L20
+ 152:main.c        ****  {
+ 153:main.c        **** 	 if (HOU<24)
+ 315               		.loc 1 153 0
+ 316 006a 8091 0000 		lds r24,HOU
+ 317 006e 9091 0000 		lds r25,HOU+1
+ 318 0072 4897      		sbiw r24,24
+ 319 0074 04F4      		brge .L21
+ 154:main.c        **** 	 {
+ 155:main.c        **** 		 HOU++;
+ 320               		.loc 1 155 0
+ 321 0076 8091 0000 		lds r24,HOU
+ 322 007a 9091 0000 		lds r25,HOU+1
+ 323 007e 0196      		adiw r24,1
+ 324 0080 9093 0000 		sts HOU+1,r25
+ 325 0084 8093 0000 		sts HOU,r24
+ 326               	.L21:
+ 156:main.c        **** 	 }
+ 157:main.c        **** 	 MIN=0;
+ 327               		.loc 1 157 0
+ 328 0088 1092 0000 		sts MIN+1,__zero_reg__
+ 329 008c 1092 0000 		sts MIN,__zero_reg__
+ 330               	.L20:
+ 158:main.c        ****  }
+ 159:main.c        ****  if (HOU==24)
+ 331               		.loc 1 159 0
+ 332 0090 8091 0000 		lds r24,HOU
+ 333 0094 9091 0000 		lds r25,HOU+1
+ 334 0098 4897      		sbiw r24,24
+ 335 009a 01F4      		brne .L16
+ 160:main.c        ****  {
+ 161:main.c        **** 	 HOU=0;
+ 336               		.loc 1 161 0
+ 337 009c 1092 0000 		sts HOU+1,__zero_reg__
+ 338 00a0 1092 0000 		sts HOU,__zero_reg__
+ 339               	.L16:
+ 340               	/* epilogue start */
+ 162:main.c        ****  }
+ 163:main.c        **** }
+ 341               		.loc 1 163 0
+ 342 00a4 9F91      		pop r25
+ 343 00a6 8F91      		pop r24
+ 344 00a8 0F90      		pop r0
+ 345 00aa 0FBE      		out __SREG__,r0
+ 346 00ac 0F90      		pop r0
+ 347 00ae 1F90      		pop r1
+ 348 00b0 1895      		reti
+ 349               		.cfi_endproc
+ 350               	.LFE7:
+ 352               	.global	__floatunsisf
+ 353               	.global	__mulsf3
+ 354               	.global	__divsf3
+ 355               	.global	__fixsfsi
+ 356               		.section	.rodata.str1.1
+ 357               	.LC1:
+ 358 0004 5465 6D70 		.string	"Temp= "
+ 358      3D20 00
+ 359               	.LC2:
+ 360 000b 2063 2000 		.string	" c "
+ 361               		.text
+ 362               	.global	__vector_1
+ 364               	__vector_1:
+ 365               	.LFB8:
+ 164:main.c        **** ISR(INT0_vect)
+ 165:main.c        **** {
+ 366               		.loc 1 165 0
+ 367               		.cfi_startproc
+ 368 00b2 1F92      		push r1
+ 369               	.LCFI4:
+ 370               		.cfi_def_cfa_offset 3
+ 371               		.cfi_offset 1, -2
+ 372 00b4 0F92      		push r0
+ 373               	.LCFI5:
+ 374               		.cfi_def_cfa_offset 4
+ 375               		.cfi_offset 0, -3
+ 376 00b6 0FB6      		in r0,__SREG__
+ 377 00b8 0F92      		push r0
+ 378 00ba 1124      		clr __zero_reg__
+ 379 00bc CF92      		push r12
+ 380               	.LCFI6:
+ 381               		.cfi_def_cfa_offset 5
+ 382               		.cfi_offset 12, -4
+ 383 00be DF92      		push r13
+ 384               	.LCFI7:
+ 385               		.cfi_def_cfa_offset 6
+ 386               		.cfi_offset 13, -5
+ 387 00c0 EF92      		push r14
+ 388               	.LCFI8:
+ 389               		.cfi_def_cfa_offset 7
+ 390               		.cfi_offset 14, -6
+ 391 00c2 FF92      		push r15
+ 392               	.LCFI9:
+ 393               		.cfi_def_cfa_offset 8
+ 394               		.cfi_offset 15, -7
+ 395 00c4 2F93      		push r18
+ 396               	.LCFI10:
+ 397               		.cfi_def_cfa_offset 9
+ 398               		.cfi_offset 18, -8
+ 399 00c6 3F93      		push r19
+ 400               	.LCFI11:
+ 401               		.cfi_def_cfa_offset 10
+ 402               		.cfi_offset 19, -9
+ 403 00c8 4F93      		push r20
+ 404               	.LCFI12:
+ 405               		.cfi_def_cfa_offset 11
+ 406               		.cfi_offset 20, -10
+ 407 00ca 5F93      		push r21
+ 408               	.LCFI13:
+ 409               		.cfi_def_cfa_offset 12
+ 410               		.cfi_offset 21, -11
+ 411 00cc 6F93      		push r22
+ 412               	.LCFI14:
+ 413               		.cfi_def_cfa_offset 13
+ 414               		.cfi_offset 22, -12
+ 415 00ce 7F93      		push r23
+ 416               	.LCFI15:
+ 417               		.cfi_def_cfa_offset 14
+ 418               		.cfi_offset 23, -13
+ 419 00d0 8F93      		push r24
+ 420               	.LCFI16:
+ 421               		.cfi_def_cfa_offset 15
+ 422               		.cfi_offset 24, -14
+ 423 00d2 9F93      		push r25
+ 424               	.LCFI17:
+ 425               		.cfi_def_cfa_offset 16
+ 426               		.cfi_offset 25, -15
+ 427 00d4 AF93      		push r26
+ 428               	.LCFI18:
+ 429               		.cfi_def_cfa_offset 17
+ 430               		.cfi_offset 26, -16
+ 431 00d6 BF93      		push r27
+ 432               	.LCFI19:
+ 433               		.cfi_def_cfa_offset 18
+ 434               		.cfi_offset 27, -17
+ 435 00d8 EF93      		push r30
+ 436               	.LCFI20:
+ 437               		.cfi_def_cfa_offset 19
+ 438               		.cfi_offset 30, -18
+ 439 00da FF93      		push r31
+ 440               	.LCFI21:
+ 441               		.cfi_def_cfa_offset 20
+ 442               		.cfi_offset 31, -19
+ 443               	/* prologue: Signal */
+ 444               	/* frame size = 0 */
+ 445               	/* stack size = 19 */
+ 446               	.L__stack_usage = 19
+ 166:main.c        **** 	
+ 167:main.c        **** 	int value;
+ 168:main.c        **** 	LCD_Init();
+ 447               		.loc 1 168 0
+ 448 00dc 0E94 0000 		call LCD_Init
+ 449               	.LVL17:
+ 169:main.c        **** 	adc_init();
+ 450               		.loc 1 169 0
+ 451 00e0 0E94 0000 		call adc_init
+ 452               	.LVL18:
+ 170:main.c        ****   
+ 171:main.c        ****    int history =0;
+ 172:main.c        ****    // while (1) 
+ 173:main.c        ****     //{
+ 174:main.c        **** //LCD_Init();
+ 175:main.c        **** 	//_LCD_CLR();
+ 176:main.c        **** 	//_delay_ms(100);
+ 177:main.c        **** 		//lcd_write_int(0);
+ 178:main.c        **** 		//lcd_write_string("Temp= ")	;
+ 179:main.c        **** 		//adc_init(); 
+ 180:main.c        **** 		//lcd_write_int((adc_read(0x0)/2)-1);
+ 181:main.c        **** 		//value = ((adc_read(0)*500.0)/1024.0);
+ 182:main.c        **** 		
+ 183:main.c        **** 		value = ((adc_read(0)*4.8828125)/10);
+ 453               		.loc 1 183 0
+ 454 00e4 80E0      		ldi r24,0
+ 455 00e6 0E94 0000 		call adc_read
+ 456               	.LVL19:
+ 457 00ea BC01      		movw r22,r24
+ 458 00ec 80E0      		ldi r24,0
+ 459 00ee 90E0      		ldi r25,0
+ 460 00f0 0E94 0000 		call __floatunsisf
+ 461               	.LVL20:
+ 462 00f4 20E0      		ldi r18,0
+ 463 00f6 30E4      		ldi r19,lo8(64)
+ 464 00f8 4CE9      		ldi r20,lo8(-100)
+ 465 00fa 50E4      		ldi r21,lo8(64)
+ 466 00fc 0E94 0000 		call __mulsf3
+ 467               	.LVL21:
+ 468 0100 20E0      		ldi r18,0
+ 469 0102 30E0      		ldi r19,0
+ 470 0104 40E2      		ldi r20,lo8(32)
+ 471 0106 51E4      		ldi r21,lo8(65)
+ 472 0108 0E94 0000 		call __divsf3
+ 473               	.LVL22:
+ 474 010c 0E94 0000 		call __fixsfsi
+ 475               	.LVL23:
+ 476 0110 6B01      		movw r12,r22
+ 477 0112 7C01      		movw r14,r24
+ 478               	.LVL24:
+ 184:main.c        **** 		if(value!=history)
+ 479               		.loc 1 184 0
+ 480 0114 672B      		or r22,r23
+ 481 0116 01F0      		breq .L23
+ 482               	.LVL25:
+ 185:main.c        **** 		{ history=value;
+ 186:main.c        **** 		LCD_CmdWrite(0x0E);	      // Display ON cuRSor ON
+ 483               		.loc 1 186 0
+ 484 0118 8EE0      		ldi r24,lo8(14)
+ 485 011a 0E94 0000 		call LCD_CmdWrite
+ 486               	.LVL26:
+ 187:main.c        **** 		LCD_CmdWrite(0x01);	      // Clear the LCD
+ 487               		.loc 1 187 0
+ 488 011e 81E0      		ldi r24,lo8(1)
+ 489 0120 0E94 0000 		call LCD_CmdWrite
+ 490               	.LVL27:
+ 188:main.c        **** 		LCD_CmdWrite(0x80);
+ 491               		.loc 1 188 0
+ 492 0124 80E8      		ldi r24,lo8(-128)
+ 493 0126 0E94 0000 		call LCD_CmdWrite
+ 494               	.LVL28:
+ 189:main.c        **** 		lcd_write_string("Temp= ")	;
+ 495               		.loc 1 189 0
+ 496 012a 80E0      		ldi r24,lo8(.LC1)
+ 497 012c 90E0      		ldi r25,hi8(.LC1)
+ 498 012e 0E94 0000 		call lcd_write_string
+ 499               	.LVL29:
+ 190:main.c        **** 		//lcd_write_int(value);
+ 191:main.c        **** 		LCD_Integer(value);
+ 500               		.loc 1 191 0
+ 501 0132 C601      		movw r24,r12
+ 502 0134 0E94 0000 		call LCD_Integer
+ 503               	.LVL30:
+ 192:main.c        **** 		//LCD_DataWrite(value);
+ 193:main.c        **** 		lcd_write_string(" c ");
+ 504               		.loc 1 193 0
+ 505 0138 80E0      		ldi r24,lo8(.LC2)
+ 506 013a 90E0      		ldi r25,hi8(.LC2)
+ 507 013c 0E94 0000 		call lcd_write_string
+ 508               	.LVL31:
+ 509               	.LBB24:
+ 510               	.LBB25:
+ 511               		.loc 2 163 0
+ 512 0140 2FE3      		ldi r18,lo8(199999)
+ 513 0142 8DE0      		ldi r24,hi8(199999)
+ 514 0144 93E0      		ldi r25,hlo8(199999)
+ 515 0146 2150      	1:	subi r18,1
+ 516 0148 8040      		sbci r24,0
+ 517 014a 9040      		sbci r25,0
+ 518 014c 01F4      		brne 1b
+ 519 014e 00C0      		rjmp .
+ 520 0150 0000      		nop
+ 521               	.LVL32:
+ 522               	.L23:
+ 523               	/* epilogue start */
+ 524               	.LBE25:
+ 525               	.LBE24:
+ 194:main.c        **** 	//LCD_CmdWrite(0x01);
+ 195:main.c        **** 		_delay_ms(1000);
+ 196:main.c        **** 		}
+ 197:main.c        **** 	//}
+ 198:main.c        **** 	
+ 199:main.c        **** 	
+ 200:main.c        **** 	
+ 201:main.c        **** }...
+ 526               		.loc 1 201 0
+ 527 0152 FF91      		pop r31
+ 528 0154 EF91      		pop r30
+ 529 0156 BF91      		pop r27
+ 530 0158 AF91      		pop r26
+ 531 015a 9F91      		pop r25
+ 532 015c 8F91      		pop r24
+ 533 015e 7F91      		pop r23
+ 534 0160 6F91      		pop r22
+ 535 0162 5F91      		pop r21
+ 536 0164 4F91      		pop r20
+ 537 0166 3F91      		pop r19
+ 538 0168 2F91      		pop r18
+ 539 016a FF90      		pop r15
+ 540 016c EF90      		pop r14
+ 541 016e DF90      		pop r13
+ 542 0170 CF90      		pop r12
+ 543               	.LVL33:
+ 544 0172 0F90      		pop r0
+ 545 0174 0FBE      		out __SREG__,r0
+ 546 0176 0F90      		pop r0
+ 547 0178 1F90      		pop r1
+ 548 017a 1895      		reti
+ 549               		.cfi_endproc
+ 550               	.LFE8:
+ 552               		.local	HOU
+ 553               		.comm	HOU,2,1
+ 554               		.local	MIN
+ 555               		.comm	MIN,2,1
+ 556               		.local	SEC
+ 557               		.comm	SEC,2,1
+ 558               	.Letext0:
+ 559               		.file 3 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cc7J7M2X.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cc7J7M2X.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cc7J7M2X.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cc7J7M2X.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cc7J7M2X.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cc7J7M2X.s:16     .text.startup:0000000000000000 main
+     /tmp/cc7J7M2X.s:553    .bss:0000000000000002 MIN
+                             .bss:0000000000000000 HOU
+     /tmp/cc7J7M2X.s:555    .bss:0000000000000004 SEC
+     /tmp/cc7J7M2X.s:250    .text:0000000000000000 __vector_11
+     /tmp/cc7J7M2X.s:364    .text:00000000000000b2 __vector_1
+
+UNDEFINED SYMBOLS
+LCD_Init
+__divmodhi4
+LCD_CmdWrite
+LCD_Integer
+lcd_write_string
+__floatunsisf
+__mulsf3
+__divsf3
+__fixsfsi
+adc_init
+adc_read
+__do_copy_data
+__do_clear_bss

@@ -1,0 +1,131 @@
+   1               		.file	"spi.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	spi_slave_init
+  12               	spi_slave_init:
+  13               	.LFB6:
+  14               		.file 1 "spi.c"
+   1:spi.c         **** #define F_CPU 1000000UL
+   2:spi.c         **** #include<avr/io.h>
+   3:spi.c         **** #include<util/delay.h>
+   4:spi.c         **** #include<avr/interrupt.h>
+   5:spi.c         **** #include"spi.h"
+   6:spi.c         **** 
+   7:spi.c         **** 
+   8:spi.c         **** void spi_slave_init(void){
+  15               		.loc 1 8 0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+   9:spi.c         **** DDRB &= ~((1<<2)|(1<<3)|(1<<5));   // SCK, MOSI and SS as inputs
+  21               		.loc 1 9 0
+  22 0000 87B3      		in r24,0x17
+  23 0002 837D      		andi r24,lo8(-45)
+  24 0004 87BB      		out 0x17,r24
+  10:spi.c         ****     DDRB |= (1<<4);                    // MISO as output
+  25               		.loc 1 10 0
+  26 0006 BC9A      		sbi 0x17,4
+  11:spi.c         **** 
+  12:spi.c         ****     SPCR &= ~(1<<MSTR);                // Set as slave 
+  27               		.loc 1 12 0
+  28 0008 6C98      		cbi 0xd,4
+  13:spi.c         ****     SPCR |= (1<<SPR0)|(1<<SPR1);       // divide clock by 128
+  29               		.loc 1 13 0
+  30 000a 8DB1      		in r24,0xd
+  31 000c 8360      		ori r24,lo8(3)
+  32 000e 8DB9      		out 0xd,r24
+  14:spi.c         ****     SPCR |= (1<<SPE); 
+  33               		.loc 1 14 0
+  34 0010 6E9A      		sbi 0xd,6
+  35 0012 0895      		ret
+  36               		.cfi_endproc
+  37               	.LFE6:
+  39               	.global	spi_master_init
+  41               	spi_master_init:
+  42               	.LFB7:
+  15:spi.c         **** 
+  16:spi.c         **** }
+  17:spi.c         **** 
+  18:spi.c         **** void spi_master_init(void){
+  43               		.loc 1 18 0
+  44               		.cfi_startproc
+  45               	/* prologue: function */
+  46               	/* frame size = 0 */
+  47               	/* stack size = 0 */
+  48               	.L__stack_usage = 0
+  19:spi.c         **** DDRB |= (1<<2)|(1<<3)|(1<<5);    // SCK, MOSI and SS as outputs
+  49               		.loc 1 19 0
+  50 0014 87B3      		in r24,0x17
+  51 0016 8C62      		ori r24,lo8(44)
+  52 0018 87BB      		out 0x17,r24
+  20:spi.c         ****     DDRB &= ~(1<<4);                 // MISO as input
+  53               		.loc 1 20 0
+  54 001a BC98      		cbi 0x17,4
+  21:spi.c         **** 
+  22:spi.c         ****     SPCR |= (1<<MSTR);               // Set as Master
+  55               		.loc 1 22 0
+  56 001c 6C9A      		sbi 0xd,4
+  23:spi.c         ****     SPCR |= (1<<SPR0)|(1<<SPR1);     // divided clock by 128
+  57               		.loc 1 23 0
+  58 001e 8DB1      		in r24,0xd
+  59 0020 8360      		ori r24,lo8(3)
+  60 0022 8DB9      		out 0xd,r24
+  24:spi.c         ****     SPCR |= (1<<SPE);                // Enable SPI
+  61               		.loc 1 24 0
+  62 0024 6E9A      		sbi 0xd,6
+  63 0026 0895      		ret
+  64               		.cfi_endproc
+  65               	.LFE7:
+  67               	.global	spi_send_receive
+  69               	spi_send_receive:
+  70               	.LFB8:
+  25:spi.c         **** }
+  26:spi.c         **** 
+  27:spi.c         **** unsigned char spi_send_receive(unsigned char data){
+  71               		.loc 1 27 0
+  72               		.cfi_startproc
+  73               	.LVL0:
+  74               	/* prologue: function */
+  75               	/* frame size = 0 */
+  76               	/* stack size = 0 */
+  77               	.L__stack_usage = 0
+  28:spi.c         **** 
+  29:spi.c         **** SPDR = data;                 // send the data
+  78               		.loc 1 29 0
+  79 0028 8FB9      		out 0xf,r24
+  80               	.L4:
+  30:spi.c         ****         while(!(SPSR & (1<<SPIF)));  // wait untiltransmission is complete
+  81               		.loc 1 30 0
+  82 002a 779B      		sbis 0xe,7
+  83 002c 00C0      		rjmp .L4
+  31:spi.c         ****          return SPDR;
+  84               		.loc 1 31 0
+  85 002e 8FB1      		in r24,0xf
+  86               	.LVL1:
+  32:spi.c         **** } 
+  87               		.loc 1 32 0
+  88 0030 0895      		ret
+  89               		.cfi_endproc
+  90               	.LFE8:
+  92               	.Letext0:
+  93               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 spi.c
+     /tmp/ccLzbrSZ.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccLzbrSZ.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccLzbrSZ.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccLzbrSZ.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccLzbrSZ.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccLzbrSZ.s:12     .text:0000000000000000 spi_slave_init
+     /tmp/ccLzbrSZ.s:41     .text:0000000000000014 spi_master_init
+     /tmp/ccLzbrSZ.s:69     .text:0000000000000028 spi_send_receive
+
+NO UNDEFINED SYMBOLS

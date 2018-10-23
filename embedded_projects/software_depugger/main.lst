@@ -1,0 +1,168 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.rodata.str1.1,"aMS",@progbits,1
+  11               	.LC0:
+  12 0000 504F 5254 		.string	"PORTC=%u\n"
+  12      433D 2575 
+  12      0A00 
+  13               	.LC1:
+  14 000a 2563 00   		.string	"%c"
+  15               		.section	.text.startup,"ax",@progbits
+  16               	.global	main
+  18               	main:
+  19               	.LFB1:
+  20               		.file 1 "main.c"
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <stdio.h>
+   3:main.c        **** #include<uart.h>
+   4:main.c        **** #include<debug.h>
+   5:main.c        **** FILE usart_str = FDEV_SETUP_STREAM(USARTSendByte, USARTReceiveByte, _FDEV_SETUP_RW);
+   6:main.c        **** int main(void)
+   7:main.c        **** {DDRC=0xff;
+  21               		.loc 1 7 0
+  22               		.cfi_startproc
+  23 0000 CF93      		push r28
+  24               	.LCFI0:
+  25               		.cfi_def_cfa_offset 3
+  26               		.cfi_offset 28, -2
+  27 0002 DF93      		push r29
+  28               	.LCFI1:
+  29               		.cfi_def_cfa_offset 4
+  30               		.cfi_offset 29, -3
+  31 0004 1F92      		push __zero_reg__
+  32               	.LCFI2:
+  33               		.cfi_def_cfa_offset 5
+  34 0006 CDB7      		in r28,__SP_L__
+  35 0008 DEB7      		in r29,__SP_H__
+  36               	.LCFI3:
+  37               		.cfi_def_cfa_register 28
+  38               	/* prologue: function */
+  39               	/* frame size = 1 */
+  40               	/* stack size = 3 */
+  41               	.L__stack_usage = 3
+  42               		.loc 1 7 0
+  43 000a 8FEF      		ldi r24,lo8(-1)
+  44 000c 84BB      		out 0x14,r24
+   8:main.c        **** PORTC=0xff;
+  45               		.loc 1 8 0
+  46 000e 85BB      		out 0x15,r24
+   9:main.c        **** uint8_t pinc=PINC;
+  47               		.loc 1 9 0
+  48 0010 83B3      		in r24,0x13
+  49 0012 8983      		std Y+1,r24
+  10:main.c        ****   uart_init();
+  50               		.loc 1 10 0
+  51 0014 00D0      		rcall uart_init
+  52               	.LVL0:
+  11:main.c        ****   stdin=stdout = &usart_str;
+  53               		.loc 1 11 0
+  54 0016 80E0      		ldi r24,lo8(usart_str)
+  55 0018 90E0      		ldi r25,hi8(usart_str)
+  56 001a 9093 0000 		sts __iob+2+1,r25
+  57 001e 8093 0000 		sts __iob+2,r24
+  58 0022 9093 0000 		sts __iob+1,r25
+  59 0026 8093 0000 		sts __iob,r24
+  12:main.c        ****   printf("PORTC=%u\n",pinc);
+  60               		.loc 1 12 0
+  61 002a 8981      		ldd r24,Y+1
+  62 002c 1F92      		push __zero_reg__
+  63 002e 8F93      		push r24
+  64 0030 80E0      		ldi r24,lo8(.LC0)
+  65 0032 90E0      		ldi r25,hi8(.LC0)
+  66 0034 9F93      		push r25
+  67 0036 8F93      		push r24
+  68 0038 00D0      		rcall printf
+  69               	.LVL1:
+  70 003a 0F90      		pop __tmp_reg__
+  71 003c 0F90      		pop __tmp_reg__
+  72 003e 0F90      		pop __tmp_reg__
+  73 0040 0F90      		pop __tmp_reg__
+  13:main.c        ****   while(1){
+  14:main.c        **** 
+  15:main.c        ****    scanf("%c",&pinc);
+  74               		.loc 1 15 0
+  75 0042 CE01      		movw r24,r28
+  76 0044 0196      		adiw r24,1
+  77 0046 6C01      		movw r12,r24
+  78 0048 80E0      		ldi r24,lo8(.LC1)
+  79 004a E82E      		mov r14,r24
+  80 004c 80E0      		ldi r24,hi8(.LC1)
+  81 004e F82E      		mov r15,r24
+  16:main.c        ****    PORTC=pinc;
+  17:main.c        ****    pinc=PINC;
+  18:main.c        ****    printf("PORTC=%u\n",pinc);
+  82               		.loc 1 18 0
+  83 0050 00E0      		ldi r16,lo8(.LC0)
+  84 0052 10E0      		ldi r17,hi8(.LC0)
+  85               	.L2:
+  15:main.c        ****    PORTC=pinc;
+  86               		.loc 1 15 0
+  87 0054 DF92      		push r13
+  88 0056 CF92      		push r12
+  89 0058 FF92      		push r15
+  90 005a EF92      		push r14
+  91 005c 00D0      		rcall scanf
+  92               	.LVL2:
+  16:main.c        ****    PORTC=pinc;
+  93               		.loc 1 16 0
+  94 005e 8981      		ldd r24,Y+1
+  95 0060 85BB      		out 0x15,r24
+  17:main.c        ****    printf("PORTC=%u\n",pinc);
+  96               		.loc 1 17 0
+  97 0062 83B3      		in r24,0x13
+  98 0064 8983      		std Y+1,r24
+  99               		.loc 1 18 0
+ 100 0066 1F92      		push __zero_reg__
+ 101 0068 8F93      		push r24
+ 102 006a 1F93      		push r17
+ 103 006c 0F93      		push r16
+ 104 006e 00D0      		rcall printf
+ 105               	.LVL3:
+  19:main.c        **** }
+ 106               		.loc 1 19 0
+ 107 0070 0FB6      		in __tmp_reg__,__SREG__
+ 108 0072 F894      		cli
+ 109 0074 DEBF      		out __SP_H__,r29
+ 110 0076 0FBE      		out __SREG__,__tmp_reg__
+ 111 0078 CDBF      		out __SP_L__,r28
+ 112 007a 00C0      		rjmp .L2
+ 113               		.cfi_endproc
+ 114               	.LFE1:
+ 116               	.global	usart_str
+ 117               		.data
+ 120               	usart_str:
+ 121 0000 0000 00   		.zero	3
+ 122 0003 03        		.byte	3
+ 123 0004 0000 0000 		.zero	4
+ 124 0008 0000      		.word	gs(USARTSendByte)
+ 125 000a 0000      		.word	gs(USARTReceiveByte)
+ 126 000c 0000      		.word	0
+ 127               		.text
+ 128               	.Letext0:
+ 129               		.file 2 "/usr/lib/avr/include/stdio.h"
+ 130               		.file 3 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccGJKbBd.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccGJKbBd.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccGJKbBd.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccGJKbBd.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccGJKbBd.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccGJKbBd.s:18     .text.startup:0000000000000000 main
+     /tmp/ccGJKbBd.s:120    .data:0000000000000000 usart_str
+
+UNDEFINED SYMBOLS
+uart_init
+__iob
+printf
+scanf
+USARTSendByte
+USARTReceiveByte
+__do_copy_data

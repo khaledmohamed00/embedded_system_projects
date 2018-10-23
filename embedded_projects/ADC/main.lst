@@ -1,0 +1,225 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.rodata.str1.1,"aMS",@progbits,1
+  11               	.LC0:
+  12 0000 7465 6D70 		.string	"temp%u\n"
+  12      2575 0A00 
+  13               		.section	.text.startup,"ax",@progbits
+  14               	.global	main
+  16               	main:
+  17               	.LFB5:
+  18               		.file 1 "main.c"
+   1:main.c        **** #include<avr/io.h>
+   2:main.c        **** #include<avr/interrupt.h>
+   3:main.c        **** #include<stdlib.h>
+   4:main.c        **** #include <stdio.h>
+   5:main.c        **** #include<uart.h>
+   6:main.c        **** #include<debug.h>
+   7:main.c        **** 
+   8:main.c        **** FILE usart_str = FDEV_SETUP_STREAM(USARTSendByte, USARTReceiveByte, _FDEV_SETUP_RW);
+   9:main.c        **** volatile int flag;
+  10:main.c        **** volatile uint16_t analogVal;
+  11:main.c        **** int main(void){
+  19               		.loc 1 11 0
+  20               		.cfi_startproc
+  21               	/* prologue: function */
+  22               	/* frame size = 0 */
+  23               	/* stack size = 0 */
+  24               	.L__stack_usage = 0
+  12:main.c        **** ADMUX|=(1<<REFS0);
+  25               		.loc 1 12 0
+  26 0000 3E9A      		sbi 0x7,6
+  13:main.c        **** ADCSR |=(1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0)|(1<<ADFR)|(1<<ADIE);
+  27               		.loc 1 13 0
+  28 0002 86B1      		in r24,0x6
+  29 0004 8F6A      		ori r24,lo8(-81)
+  30 0006 86B9      		out 0x6,r24
+  14:main.c        **** sei();
+  31               		.loc 1 14 0
+  32               	/* #APP */
+  33               	 ;  14 "main.c" 1
+  34 0008 7894      		sei
+  35               	 ;  0 "" 2
+  15:main.c        **** ADCSR|=(1<<ADSC);
+  36               		.loc 1 15 0
+  37               	/* #NOAPP */
+  38 000a 369A      		sbi 0x6,6
+  16:main.c        **** stdin=stdout = &usart_str;
+  39               		.loc 1 16 0
+  40 000c 80E0      		ldi r24,lo8(usart_str)
+  41 000e 90E0      		ldi r25,hi8(usart_str)
+  42 0010 9093 0000 		sts __iob+2+1,r25
+  43 0014 8093 0000 		sts __iob+2,r24
+  44 0018 9093 0000 		sts __iob+1,r25
+  45 001c 8093 0000 		sts __iob,r24
+  17:main.c        **** uart_init();
+  46               		.loc 1 17 0
+  47 0020 00D0      		rcall uart_init
+  48               	.LVL0:
+  18:main.c        **** while(1){
+  19:main.c        **** if (flag==1)
+  20:main.c        **** {printf("temp%u\n",(uint16_t)(5*100*analogVal)/(1024));
+  49               		.loc 1 20 0
+  50 0022 04EF      		ldi r16,lo8(-12)
+  51 0024 11E0      		ldi r17,lo8(1)
+  52 0026 C0E0      		ldi r28,lo8(.LC0)
+  53 0028 D0E0      		ldi r29,hi8(.LC0)
+  54               	.L2:
+  19:main.c        **** {printf("temp%u\n",(uint16_t)(5*100*analogVal)/(1024));
+  55               		.loc 1 19 0
+  56 002a 8091 0000 		lds r24,flag
+  57 002e 9091 0000 		lds r25,flag+1
+  58 0032 0197      		sbiw r24,1
+  59 0034 01F4      		brne .L2
+  60               		.loc 1 20 0
+  61 0036 2091 0000 		lds r18,analogVal
+  62 003a 3091 0000 		lds r19,analogVal+1
+  63 003e 209F      		mul r18,r16
+  64 0040 C001      		movw r24,r0
+  65 0042 219F      		mul r18,r17
+  66 0044 900D      		add r25,r0
+  67 0046 309F      		mul r19,r16
+  68 0048 900D      		add r25,r0
+  69 004a 1124      		clr r1
+  70 004c 892F      		mov r24,r25
+  71 004e 8695      		lsr r24
+  72 0050 8695      		lsr r24
+  73 0052 1F92      		push __zero_reg__
+  74               	.LCFI0:
+  75               		.cfi_def_cfa_offset 3
+  76 0054 8F93      		push r24
+  77               	.LCFI1:
+  78               		.cfi_def_cfa_offset 4
+  79 0056 DF93      		push r29
+  80               	.LCFI2:
+  81               		.cfi_def_cfa_offset 5
+  82 0058 CF93      		push r28
+  83               	.LCFI3:
+  84               		.cfi_def_cfa_offset 6
+  85 005a 00D0      		rcall printf
+  86               	.LVL1:
+  21:main.c        **** flag=0;
+  87               		.loc 1 21 0
+  88 005c 1092 0000 		sts flag+1,__zero_reg__
+  89 0060 1092 0000 		sts flag,__zero_reg__
+  90 0064 0F90      		pop __tmp_reg__
+  91 0066 0F90      		pop __tmp_reg__
+  92 0068 0F90      		pop __tmp_reg__
+  93 006a 0F90      		pop __tmp_reg__
+  94               	.LCFI4:
+  95               		.cfi_def_cfa_offset 2
+  96 006c 00C0      		rjmp .L2
+  97               		.cfi_endproc
+  98               	.LFE5:
+ 100               		.text
+ 101               	.global	__vector_14
+ 103               	__vector_14:
+ 104               	.LFB6:
+  22:main.c        **** }
+  23:main.c        **** }
+  24:main.c        **** 
+  25:main.c        **** 
+  26:main.c        **** return 0;
+  27:main.c        **** }
+  28:main.c        **** ISR(ADC_vect){
+ 105               		.loc 1 28 0
+ 106               		.cfi_startproc
+ 107 0000 1F92      		push r1
+ 108               	.LCFI5:
+ 109               		.cfi_def_cfa_offset 3
+ 110               		.cfi_offset 1, -2
+ 111 0002 0F92      		push r0
+ 112               	.LCFI6:
+ 113               		.cfi_def_cfa_offset 4
+ 114               		.cfi_offset 0, -3
+ 115 0004 0FB6      		in r0,__SREG__
+ 116 0006 0F92      		push r0
+ 117 0008 1124      		clr __zero_reg__
+ 118 000a 2F93      		push r18
+ 119               	.LCFI7:
+ 120               		.cfi_def_cfa_offset 5
+ 121               		.cfi_offset 18, -4
+ 122 000c 8F93      		push r24
+ 123               	.LCFI8:
+ 124               		.cfi_def_cfa_offset 6
+ 125               		.cfi_offset 24, -5
+ 126 000e 9F93      		push r25
+ 127               	.LCFI9:
+ 128               		.cfi_def_cfa_offset 7
+ 129               		.cfi_offset 25, -6
+ 130               	/* prologue: Signal */
+ 131               	/* frame size = 0 */
+ 132               	/* stack size = 6 */
+ 133               	.L__stack_usage = 6
+  29:main.c        **** flag=1;
+ 134               		.loc 1 29 0
+ 135 0010 81E0      		ldi r24,lo8(1)
+ 136 0012 90E0      		ldi r25,0
+ 137 0014 9093 0000 		sts flag+1,r25
+ 138 0018 8093 0000 		sts flag,r24
+  30:main.c        **** analogVal=ADCL|(ADCH<<8);
+ 139               		.loc 1 30 0
+ 140 001c 84B1      		in r24,0x4
+ 141 001e 25B1      		in r18,0x5
+ 142 0020 90E0      		ldi r25,0
+ 143 0022 922B      		or r25,r18
+ 144 0024 9093 0000 		sts analogVal+1,r25
+ 145 0028 8093 0000 		sts analogVal,r24
+ 146               	/* epilogue start */
+  31:main.c        **** 
+  32:main.c        **** 
+  33:main.c        **** }
+ 147               		.loc 1 33 0
+ 148 002c 9F91      		pop r25
+ 149 002e 8F91      		pop r24
+ 150 0030 2F91      		pop r18
+ 151 0032 0F90      		pop r0
+ 152 0034 0FBE      		out __SREG__,r0
+ 153 0036 0F90      		pop r0
+ 154 0038 1F90      		pop r1
+ 155 003a 1895      		reti
+ 156               		.cfi_endproc
+ 157               	.LFE6:
+ 159               		.comm	analogVal,2,1
+ 160               		.comm	flag,2,1
+ 161               	.global	usart_str
+ 162               		.data
+ 165               	usart_str:
+ 166 0000 0000 00   		.zero	3
+ 167 0003 03        		.byte	3
+ 168 0004 0000 0000 		.zero	4
+ 169 0008 0000      		.word	gs(USARTSendByte)
+ 170 000a 0000      		.word	gs(USARTReceiveByte)
+ 171 000c 0000      		.word	0
+ 172               		.text
+ 173               	.Letext0:
+ 174               		.file 2 "/usr/lib/avr/include/stdint.h"
+ 175               		.file 3 "/usr/lib/avr/include/stdio.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cc6H6siI.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cc6H6siI.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cc6H6siI.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cc6H6siI.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cc6H6siI.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cc6H6siI.s:16     .text.startup:0000000000000000 main
+     /tmp/cc6H6siI.s:165    .data:0000000000000000 usart_str
+                            *COM*:0000000000000002 flag
+                            *COM*:0000000000000002 analogVal
+     /tmp/cc6H6siI.s:103    .text:0000000000000000 __vector_14
+
+UNDEFINED SYMBOLS
+__iob
+uart_init
+printf
+USARTSendByte
+USARTReceiveByte
+__do_copy_data
+__do_clear_bss

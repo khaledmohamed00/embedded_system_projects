@@ -1,0 +1,635 @@
+   1               		.file	"keybad.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	pressed_key
+  12               	pressed_key:
+  13               	.LFB6:
+  14               		.file 1 "keybad.c"
+   1:keybad.c      **** #define F_CPU 1000000UL
+   2:keybad.c      **** #include<avr/io.h>
+   3:keybad.c      **** #include<util/delay.h>
+   4:keybad.c      **** #include "keybad.h"
+   5:keybad.c      **** 
+   6:keybad.c      **** 
+   7:keybad.c      **** unsigned char pressed_key(void){
+  15               		.loc 1 7 0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+   8:keybad.c      **** 
+   9:keybad.c      **** KEY_DDR=0x0f;
+  21               		.loc 1 9 0
+  22 0000 9FE0      		ldi r25,lo8(15)
+  23 0002 9AB9      		out 0xa,r25
+  10:keybad.c      **** 
+  11:keybad.c      **** KEY_PRT=0xf0;
+  24               		.loc 1 11 0
+  25 0004 90EF      		ldi r25,lo8(-16)
+  26 0006 9BB9      		out 0xb,r25
+  27               	.L2:
+  12:keybad.c      **** unsigned char key;
+  13:keybad.c      **** while(KEY_PIN==0xf0);
+  28               		.loc 1 13 0
+  29 0008 99B1      		in r25,0x9
+  30 000a 903F      		cpi r25,lo8(-16)
+  31 000c 01F0      		breq .L2
+  14:keybad.c      **** if(KEY_PIN!=0xf0){
+  32               		.loc 1 14 0
+  33 000e 99B1      		in r25,0x9
+  34 0010 903F      		cpi r25,lo8(-16)
+  35 0012 01F0      		breq .L3
+  36               	.LVL0:
+  37               	.LBB5:
+  38               	.LBB6:
+  39               		.file 2 "/usr/lib/avr/include/util/delay.h"
+   1:/usr/lib/avr/include/util/delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:/usr/lib/avr/include/util/delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:/usr/lib/avr/include/util/delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:/usr/lib/avr/include/util/delay.h ****    All rights reserved.
+   5:/usr/lib/avr/include/util/delay.h **** 
+   6:/usr/lib/avr/include/util/delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:/usr/lib/avr/include/util/delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:/usr/lib/avr/include/util/delay.h **** 
+   9:/usr/lib/avr/include/util/delay.h ****    * Redistributions of source code must retain the above copyright
+  10:/usr/lib/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:/usr/lib/avr/include/util/delay.h **** 
+  12:/usr/lib/avr/include/util/delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:/usr/lib/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:/usr/lib/avr/include/util/delay.h ****      the documentation and/or other materials provided with the
+  15:/usr/lib/avr/include/util/delay.h ****      distribution.
+  16:/usr/lib/avr/include/util/delay.h **** 
+  17:/usr/lib/avr/include/util/delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:/usr/lib/avr/include/util/delay.h ****      contributors may be used to endorse or promote products derived
+  19:/usr/lib/avr/include/util/delay.h ****      from this software without specific prior written permission.
+  20:/usr/lib/avr/include/util/delay.h **** 
+  21:/usr/lib/avr/include/util/delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:/usr/lib/avr/include/util/delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:/usr/lib/avr/include/util/delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:/usr/lib/avr/include/util/delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:/usr/lib/avr/include/util/delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:/usr/lib/avr/include/util/delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:/usr/lib/avr/include/util/delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:/usr/lib/avr/include/util/delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:/usr/lib/avr/include/util/delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:/usr/lib/avr/include/util/delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:/usr/lib/avr/include/util/delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:/usr/lib/avr/include/util/delay.h **** 
+  33:/usr/lib/avr/include/util/delay.h **** /* $Id$ */
+  34:/usr/lib/avr/include/util/delay.h **** 
+  35:/usr/lib/avr/include/util/delay.h **** #ifndef _UTIL_DELAY_H_
+  36:/usr/lib/avr/include/util/delay.h **** #define _UTIL_DELAY_H_ 1
+  37:/usr/lib/avr/include/util/delay.h **** 
+  38:/usr/lib/avr/include/util/delay.h **** #ifndef __HAS_DELAY_CYCLES
+  39:/usr/lib/avr/include/util/delay.h **** #define __HAS_DELAY_CYCLES 1
+  40:/usr/lib/avr/include/util/delay.h **** #endif
+  41:/usr/lib/avr/include/util/delay.h **** 
+  42:/usr/lib/avr/include/util/delay.h **** #include <inttypes.h>
+  43:/usr/lib/avr/include/util/delay.h **** #include <util/delay_basic.h>
+  44:/usr/lib/avr/include/util/delay.h **** #include <math.h>
+  45:/usr/lib/avr/include/util/delay.h **** 
+  46:/usr/lib/avr/include/util/delay.h **** /** \file */
+  47:/usr/lib/avr/include/util/delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  48:/usr/lib/avr/include/util/delay.h ****     \code
+  49:/usr/lib/avr/include/util/delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  50:/usr/lib/avr/include/util/delay.h ****     //#define F_CPU 14.7456E6
+  51:/usr/lib/avr/include/util/delay.h ****     #include <util/delay.h>
+  52:/usr/lib/avr/include/util/delay.h ****     \endcode
+  53:/usr/lib/avr/include/util/delay.h **** 
+  54:/usr/lib/avr/include/util/delay.h ****     \note As an alternative method, it is possible to pass the
+  55:/usr/lib/avr/include/util/delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  56:/usr/lib/avr/include/util/delay.h ****     Obviously, in that case, no \c \#define statement should be
+  57:/usr/lib/avr/include/util/delay.h ****     used.
+  58:/usr/lib/avr/include/util/delay.h **** 
+  59:/usr/lib/avr/include/util/delay.h ****     The functions in this header file are wrappers around the basic
+  60:/usr/lib/avr/include/util/delay.h ****     busy-wait functions from <util/delay_basic.h>.  They are meant as
+  61:/usr/lib/avr/include/util/delay.h ****     convenience functions where actual time values can be specified
+  62:/usr/lib/avr/include/util/delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  63:/usr/lib/avr/include/util/delay.h ****     that compile-time constant expressions will be eliminated by
+  64:/usr/lib/avr/include/util/delay.h ****     compiler optimization so floating-point expressions can be used
+  65:/usr/lib/avr/include/util/delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  66:/usr/lib/avr/include/util/delay.h ****     frequency passed by the macro F_CPU.
+  67:/usr/lib/avr/include/util/delay.h **** 
+  68:/usr/lib/avr/include/util/delay.h ****     \note In order for these functions to work as intended, compiler
+  69:/usr/lib/avr/include/util/delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  70:/usr/lib/avr/include/util/delay.h ****     <em>must</em> be an expression that is a known constant at
+  71:/usr/lib/avr/include/util/delay.h ****     compile-time.  If these requirements are not met, the resulting
+  72:/usr/lib/avr/include/util/delay.h ****     delay will be much longer (and basically unpredictable), and
+  73:/usr/lib/avr/include/util/delay.h ****     applications that otherwise do not use floating-point calculations
+  74:/usr/lib/avr/include/util/delay.h ****     will experience severe code bloat by the floating-point library
+  75:/usr/lib/avr/include/util/delay.h ****     routines linked into the application.
+  76:/usr/lib/avr/include/util/delay.h **** 
+  77:/usr/lib/avr/include/util/delay.h ****     The functions available allow the specification of microsecond, and
+  78:/usr/lib/avr/include/util/delay.h ****     millisecond delays directly, using the application-supplied macro
+  79:/usr/lib/avr/include/util/delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  80:/usr/lib/avr/include/util/delay.h **** 
+  81:/usr/lib/avr/include/util/delay.h **** */
+  82:/usr/lib/avr/include/util/delay.h **** 
+  83:/usr/lib/avr/include/util/delay.h **** #if !defined(__DOXYGEN__)
+  84:/usr/lib/avr/include/util/delay.h **** static inline void _delay_us(double __us) __attribute__((always_inline));
+  85:/usr/lib/avr/include/util/delay.h **** static inline void _delay_ms(double __ms) __attribute__((always_inline));
+  86:/usr/lib/avr/include/util/delay.h **** #endif
+  87:/usr/lib/avr/include/util/delay.h **** 
+  88:/usr/lib/avr/include/util/delay.h **** #ifndef F_CPU
+  89:/usr/lib/avr/include/util/delay.h **** /* prevent compiler error by supplying a default */
+  90:/usr/lib/avr/include/util/delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  91:/usr/lib/avr/include/util/delay.h **** # define F_CPU 1000000UL
+  92:/usr/lib/avr/include/util/delay.h **** #endif
+  93:/usr/lib/avr/include/util/delay.h **** 
+  94:/usr/lib/avr/include/util/delay.h **** #ifndef __OPTIMIZE__
+  95:/usr/lib/avr/include/util/delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+  96:/usr/lib/avr/include/util/delay.h **** #endif
+  97:/usr/lib/avr/include/util/delay.h **** 
+  98:/usr/lib/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+  99:/usr/lib/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 100:/usr/lib/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 101:/usr/lib/avr/include/util/delay.h **** #  include <math.h>
+ 102:/usr/lib/avr/include/util/delay.h **** #endif
+ 103:/usr/lib/avr/include/util/delay.h **** 
+ 104:/usr/lib/avr/include/util/delay.h **** /**
+ 105:/usr/lib/avr/include/util/delay.h ****    \ingroup util_delay
+ 106:/usr/lib/avr/include/util/delay.h **** 
+ 107:/usr/lib/avr/include/util/delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 108:/usr/lib/avr/include/util/delay.h **** 
+ 109:/usr/lib/avr/include/util/delay.h ****    The macro F_CPU is supposed to be defined to a
+ 110:/usr/lib/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 111:/usr/lib/avr/include/util/delay.h **** 
+ 112:/usr/lib/avr/include/util/delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 113:/usr/lib/avr/include/util/delay.h **** 
+ 114:/usr/lib/avr/include/util/delay.h ****    When the user request delay which exceed the maximum possible one,
+ 115:/usr/lib/avr/include/util/delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 116:/usr/lib/avr/include/util/delay.h ****    mode _delay_ms() will work with a resolution of 1/10 ms, providing
+ 117:/usr/lib/avr/include/util/delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 118:/usr/lib/avr/include/util/delay.h ****    user will not be informed about decreased resolution.
+ 119:/usr/lib/avr/include/util/delay.h **** 
+ 120:/usr/lib/avr/include/util/delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles(unsigned long)
+ 121:/usr/lib/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 122:/usr/lib/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflows results in
+ 123:/usr/lib/avr/include/util/delay.h ****    no delay i.e., 0ms.
+ 124:/usr/lib/avr/include/util/delay.h **** 
+ 125:/usr/lib/avr/include/util/delay.h ****    Conversion of __us into clock cycles may not always result in integer.
+ 126:/usr/lib/avr/include/util/delay.h ****    By default, the clock cycles rounded up to next integer. This ensures that
+ 127:/usr/lib/avr/include/util/delay.h ****    the user gets atleast __us microseconds of delay.
+ 128:/usr/lib/avr/include/util/delay.h **** 
+ 129:/usr/lib/avr/include/util/delay.h ****    Alternatively, user can define __DELAY_ROUND_DOWN__ and __DELAY_ROUND_CLOSEST__
+ 130:/usr/lib/avr/include/util/delay.h ****    to round down and round to closest integer.
+ 131:/usr/lib/avr/include/util/delay.h **** 
+ 132:/usr/lib/avr/include/util/delay.h ****    Note: The new implementation of _delay_ms(double __ms) with 
+ 133:/usr/lib/avr/include/util/delay.h ****     __builtin_avr_delay_cycles(unsigned long) support is not backward compatible. 
+ 134:/usr/lib/avr/include/util/delay.h ****    User can define __DELAY_BACKWARD_COMPATIBLE__ to get a backward compatible delay.
+ 135:/usr/lib/avr/include/util/delay.h ****    Also, the backward compatible
+ 136:/usr/lib/avr/include/util/delay.h ****    algorithm will be chosen if the code is compiled in a <em>freestanding
+ 137:/usr/lib/avr/include/util/delay.h ****    environment</em> (GCC option \c -ffreestanding), as the math functions
+ 138:/usr/lib/avr/include/util/delay.h ****    required for rounding are not available to the compiler then.
+ 139:/usr/lib/avr/include/util/delay.h **** 
+ 140:/usr/lib/avr/include/util/delay.h ****  */
+ 141:/usr/lib/avr/include/util/delay.h **** void
+ 142:/usr/lib/avr/include/util/delay.h **** _delay_ms(double __ms)
+ 143:/usr/lib/avr/include/util/delay.h **** {
+ 144:/usr/lib/avr/include/util/delay.h **** 	double __tmp ; 
+ 145:/usr/lib/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 146:/usr/lib/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 147:/usr/lib/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 148:/usr/lib/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 149:/usr/lib/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 150:/usr/lib/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 151:/usr/lib/avr/include/util/delay.h **** 
+ 152:/usr/lib/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 153:/usr/lib/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 154:/usr/lib/avr/include/util/delay.h **** 
+ 155:/usr/lib/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 156:/usr/lib/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 157:/usr/lib/avr/include/util/delay.h **** 
+ 158:/usr/lib/avr/include/util/delay.h **** 	#else
+ 159:/usr/lib/avr/include/util/delay.h **** 		//round up by default
+ 160:/usr/lib/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 161:/usr/lib/avr/include/util/delay.h **** 	#endif
+ 162:/usr/lib/avr/include/util/delay.h **** 
+ 163:/usr/lib/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+  40               		.loc 2 163 0
+  41 0014 E3ED      		ldi r30,lo8(12499)
+  42 0016 F0E3      		ldi r31,hi8(12499)
+  43 0018 3197      	1:	sbiw r30,1
+  44 001a 01F4      		brne 1b
+  45 001c 00C0      		rjmp .
+  46 001e 0000      		nop
+  47               	.LVL1:
+  48               	.L3:
+  49               	.LBE6:
+  50               	.LBE5:
+  15:keybad.c      **** _delay_ms(50);
+  16:keybad.c      **** }
+  17:keybad.c      **** if(KEY_PIN !=0xf0){
+  51               		.loc 1 17 0
+  52 0020 99B1      		in r25,0x9
+  53 0022 903F      		cpi r25,lo8(-16)
+  54 0024 01F4      		brne .+2
+  55 0026 00C0      		rjmp .L46
+  56               	.LBB7:
+  18:keybad.c      **** 
+  19:keybad.c      **** //_delay_ms(50);
+  20:keybad.c      **** 
+  21:keybad.c      **** unsigned char input=KEY_PIN;
+  57               		.loc 1 21 0
+  58 0028 99B1      		in r25,0x9
+  59               	.LVL2:
+  22:keybad.c      **** input=input & 0xf0;
+  23:keybad.c      **** int row=-1;
+  24:keybad.c      **** int col=-1;
+  25:keybad.c      **** if((input & (1<<4))==0)
+  60               		.loc 1 25 0
+  61 002a 94FF      		sbrs r25,4
+  62 002c 00C0      		rjmp .L21
+  26:keybad.c      ****   row=0;
+  27:keybad.c      **** else if((input &(1<<5))==0)
+  63               		.loc 1 27 0
+  64 002e 95FF      		sbrs r25,5
+  65 0030 00C0      		rjmp .L22
+  28:keybad.c      ****   row=1;
+  29:keybad.c      **** else if((input &(1<<6))==0)
+  66               		.loc 1 29 0
+  67 0032 96FF      		sbrs r25,6
+  68 0034 00C0      		rjmp .L23
+  30:keybad.c      ****   row=2;
+  31:keybad.c      **** else if((input &(1<<7))==0)
+  69               		.loc 1 31 0
+  70 0036 97FF      		sbrs r25,7
+  71 0038 00C0      		rjmp .L24
+  23:keybad.c      **** int col=-1;
+  72               		.loc 1 23 0
+  73 003a 2FEF      		ldi r18,lo8(-1)
+  74 003c 3FEF      		ldi r19,lo8(-1)
+  75               	.LVL3:
+  76               	.L14:
+  32:keybad.c      ****  row=3;
+  33:keybad.c      **** if(row!=-1)
+  34:keybad.c      ****  PORTC=0xff;
+  35:keybad.c      **** 
+  36:keybad.c      **** KEY_DDR=0xf0;
+  77               		.loc 1 36 0
+  78 003e 90EF      		ldi r25,lo8(-16)
+  79 0040 9AB9      		out 0xa,r25
+  37:keybad.c      **** KEY_PRT=0x0f;
+  80               		.loc 1 37 0
+  81 0042 9FE0      		ldi r25,lo8(15)
+  82 0044 9BB9      		out 0xb,r25
+  38:keybad.c      **** 
+  39:keybad.c      **** input=KEY_PIN;
+  83               		.loc 1 39 0
+  84 0046 99B1      		in r25,0x9
+  85               	.LVL4:
+  40:keybad.c      **** input=input & 0x0f;
+  41:keybad.c      **** if((input & (1<<0))==0)
+  86               		.loc 1 41 0
+  87 0048 90FF      		sbrs r25,0
+  88 004a 00C0      		rjmp .L6
+  42:keybad.c      ****   col=0;
+  43:keybad.c      **** else if((input & (1<<1))==0)
+  89               		.loc 1 43 0
+  90 004c 91FF      		sbrs r25,1
+  91 004e 00C0      		rjmp .L7
+  44:keybad.c      ****   col=1;
+  45:keybad.c      **** else if((input &(1<<2))==0)
+  92               		.loc 1 45 0
+  93 0050 92FF      		sbrs r25,2
+  94 0052 00C0      		rjmp .L8
+  46:keybad.c      ****   col=2;
+  47:keybad.c      **** else if((input &(1<<3))==0)
+  95               		.loc 1 47 0
+  96 0054 93FF      		sbrs r25,3
+  97 0056 00C0      		rjmp .L9
+  98 0058 00C0      		rjmp .L60
+  99               	.LVL5:
+ 100               	.L21:
+  26:keybad.c      **** else if((input &(1<<5))==0)
+ 101               		.loc 1 26 0
+ 102 005a 20E0      		ldi r18,0
+ 103 005c 30E0      		ldi r19,0
+ 104 005e 00C0      		rjmp .L5
+ 105               	.L22:
+  28:keybad.c      **** else if((input &(1<<6))==0)
+ 106               		.loc 1 28 0
+ 107 0060 21E0      		ldi r18,lo8(1)
+ 108 0062 30E0      		ldi r19,0
+ 109 0064 00C0      		rjmp .L5
+ 110               	.L23:
+  30:keybad.c      **** else if((input &(1<<7))==0)
+ 111               		.loc 1 30 0
+ 112 0066 22E0      		ldi r18,lo8(2)
+ 113 0068 30E0      		ldi r19,0
+ 114 006a 00C0      		rjmp .L5
+ 115               	.L24:
+  32:keybad.c      **** if(row!=-1)
+ 116               		.loc 1 32 0
+ 117 006c 23E0      		ldi r18,lo8(3)
+ 118 006e 30E0      		ldi r19,0
+ 119               	.L5:
+ 120               	.LVL6:
+  34:keybad.c      **** 
+ 121               		.loc 1 34 0
+ 122 0070 9FEF      		ldi r25,lo8(-1)
+ 123               	.LVL7:
+ 124 0072 98B9      		out 0x8,r25
+ 125 0074 00C0      		rjmp .L14
+ 126               	.LVL8:
+ 127               	.L6:
+  48:keybad.c      ****  col=3;
+  49:keybad.c      **** 
+  50:keybad.c      **** 
+  51:keybad.c      **** if(row==0 && col==0)
+ 128               		.loc 1 51 0
+ 129 0076 2115      		cp r18,__zero_reg__
+ 130 0078 3105      		cpc r19,__zero_reg__
+ 131 007a 01F0      		breq .+2
+ 132 007c 00C0      		rjmp .L61
+  52:keybad.c      ****  key='7';
+ 133               		.loc 1 52 0
+ 134 007e 87E3      		ldi r24,lo8(55)
+ 135 0080 0895      		ret
+ 136               	.LVL9:
+ 137               	.L7:
+  51:keybad.c      ****  key='7';
+ 138               		.loc 1 51 0
+ 139 0082 2115      		cp r18,__zero_reg__
+ 140 0084 3105      		cpc r19,__zero_reg__
+ 141 0086 01F4      		brne .L62
+  53:keybad.c      **** else if(row==0 && col==1)
+  54:keybad.c      **** key='8';
+ 142               		.loc 1 54 0
+ 143 0088 88E3      		ldi r24,lo8(56)
+ 144 008a 0895      		ret
+ 145               	.L62:
+  55:keybad.c      **** else if(row==0 && col==2)
+  56:keybad.c      **** key='9';
+  57:keybad.c      **** else if(row==0 && col==3)
+  58:keybad.c      **** key='/';
+  59:keybad.c      **** else if(row==1 && col==0)
+ 146               		.loc 1 59 0
+ 147 008c 2130      		cpi r18,1
+ 148 008e 3105      		cpc r19,__zero_reg__
+ 149 0090 01F4      		brne .L63
+ 150               	.LVL10:
+ 151               	.L36:
+  60:keybad.c      **** key='4';
+  61:keybad.c      **** else if(row==1 && col==1)
+  62:keybad.c      **** key='5';
+ 152               		.loc 1 62 0
+ 153 0092 85E3      		ldi r24,lo8(53)
+ 154 0094 0895      		ret
+ 155               	.LVL11:
+ 156               	.L63:
+  44:keybad.c      **** else if((input &(1<<2))==0)
+ 157               		.loc 1 44 0
+ 158 0096 41E0      		ldi r20,lo8(1)
+ 159 0098 50E0      		ldi r21,0
+  63:keybad.c      **** else if(row==1 && col==2)
+  64:keybad.c      **** key='6';
+  65:keybad.c      **** else if(row==1 && col==3)
+  66:keybad.c      **** key='x';
+  67:keybad.c      **** else if(row==2 && col==0)
+ 160               		.loc 1 67 0
+ 161 009a 2230      		cpi r18,2
+ 162 009c 3105      		cpc r19,__zero_reg__
+ 163 009e 01F4      		brne .L12
+ 164               	.LVL12:
+ 165               	.L13:
+  68:keybad.c      **** key='1';
+  69:keybad.c      **** else if(row==2 && col==1)
+ 166               		.loc 1 69 0
+ 167 00a0 4130      		cpi r20,1
+ 168 00a2 5105      		cpc r21,__zero_reg__
+ 169 00a4 01F0      		breq .L29
+  70:keybad.c      **** key='2';
+  71:keybad.c      **** else if(row==2 && col==2)
+ 170               		.loc 1 71 0
+ 171 00a6 4230      		cpi r20,2
+ 172 00a8 5105      		cpc r21,__zero_reg__
+ 173 00aa 01F0      		breq .L30
+  72:keybad.c      **** key='3';
+  73:keybad.c      **** else if(row==2 && col==3)
+ 174               		.loc 1 73 0
+ 175 00ac 4330      		cpi r20,3
+ 176 00ae 5105      		cpc r21,__zero_reg__
+ 177 00b0 01F0      		breq .+2
+ 178 00b2 00C0      		rjmp .L46
+  74:keybad.c      **** key='-';
+ 179               		.loc 1 74 0
+ 180 00b4 8DE2      		ldi r24,lo8(45)
+ 181 00b6 0895      		ret
+ 182               	.LVL13:
+ 183               	.L67:
+  48:keybad.c      **** 
+ 184               		.loc 1 48 0
+ 185 00b8 43E0      		ldi r20,lo8(3)
+ 186 00ba 50E0      		ldi r21,0
+ 187               	.LVL14:
+ 188               	.L18:
+  59:keybad.c      **** key='4';
+ 189               		.loc 1 59 0
+ 190 00bc 2130      		cpi r18,1
+ 191 00be 3105      		cpc r19,__zero_reg__
+ 192 00c0 01F4      		brne .+2
+ 193 00c2 00C0      		rjmp .L64
+  67:keybad.c      **** key='1';
+ 194               		.loc 1 67 0
+ 195 00c4 2230      		cpi r18,2
+ 196 00c6 3105      		cpc r19,__zero_reg__
+ 197 00c8 01F4      		brne .+2
+ 198 00ca 00C0      		rjmp .L65
+ 199               	.L12:
+  75:keybad.c      **** else if(row==3 && col==0)
+ 200               		.loc 1 75 0
+ 201 00cc 2330      		cpi r18,3
+ 202 00ce 3105      		cpc r19,__zero_reg__
+ 203 00d0 01F0      		breq .+2
+ 204 00d2 00C0      		rjmp .L46
+ 205               		.loc 1 75 0 is_stmt 0
+ 206 00d4 4115      		cp r20,__zero_reg__
+ 207 00d6 5105      		cpc r21,__zero_reg__
+ 208 00d8 01F0      		breq .L31
+  76:keybad.c      **** key='c';
+  77:keybad.c      **** else if(row==3 && col==1)
+ 209               		.loc 1 77 0 is_stmt 1
+ 210 00da 4130      		cpi r20,1
+ 211 00dc 5105      		cpc r21,__zero_reg__
+ 212 00de 01F0      		breq .L32
+  78:keybad.c      **** key='0';
+  79:keybad.c      **** else if(row==3 && col==2)
+ 213               		.loc 1 79 0
+ 214 00e0 4230      		cpi r20,2
+ 215 00e2 5105      		cpc r21,__zero_reg__
+ 216 00e4 01F0      		breq .L33
+  80:keybad.c      **** key='=';
+  81:keybad.c      **** else if(row==3 && col==3)
+ 217               		.loc 1 81 0
+ 218 00e6 4330      		cpi r20,3
+ 219 00e8 5105      		cpc r21,__zero_reg__
+ 220 00ea 01F4      		brne .L46
+  82:keybad.c      **** key='+';
+ 221               		.loc 1 82 0
+ 222 00ec 8BE2      		ldi r24,lo8(43)
+ 223 00ee 0895      		ret
+ 224               	.L29:
+  70:keybad.c      **** else if(row==2 && col==2)
+ 225               		.loc 1 70 0
+ 226 00f0 82E3      		ldi r24,lo8(50)
+ 227 00f2 0895      		ret
+ 228               	.L30:
+  72:keybad.c      **** else if(row==2 && col==3)
+ 229               		.loc 1 72 0
+ 230 00f4 83E3      		ldi r24,lo8(51)
+ 231 00f6 0895      		ret
+ 232               	.L31:
+  76:keybad.c      **** else if(row==3 && col==1)
+ 233               		.loc 1 76 0
+ 234 00f8 83E6      		ldi r24,lo8(99)
+ 235 00fa 0895      		ret
+ 236               	.L32:
+  78:keybad.c      **** else if(row==3 && col==2)
+ 237               		.loc 1 78 0
+ 238 00fc 80E3      		ldi r24,lo8(48)
+ 239 00fe 0895      		ret
+ 240               	.L33:
+  80:keybad.c      **** else if(row==3 && col==3)
+ 241               		.loc 1 80 0
+ 242 0100 8DE3      		ldi r24,lo8(61)
+ 243 0102 0895      		ret
+ 244               	.LVL15:
+ 245               	.L61:
+  59:keybad.c      **** key='4';
+ 246               		.loc 1 59 0
+ 247 0104 2130      		cpi r18,1
+ 248 0106 3105      		cpc r19,__zero_reg__
+ 249 0108 01F4      		brne .L66
+  60:keybad.c      **** else if(row==1 && col==1)
+ 250               		.loc 1 60 0
+ 251 010a 84E3      		ldi r24,lo8(52)
+ 252 010c 0895      		ret
+ 253               	.L66:
+  42:keybad.c      **** else if((input & (1<<1))==0)
+ 254               		.loc 1 42 0
+ 255 010e 40E0      		ldi r20,0
+ 256 0110 50E0      		ldi r21,0
+  67:keybad.c      **** key='1';
+ 257               		.loc 1 67 0
+ 258 0112 2230      		cpi r18,2
+ 259 0114 3105      		cpc r19,__zero_reg__
+ 260 0116 01F4      		brne .L12
+ 261               	.LVL16:
+ 262               	.L40:
+  68:keybad.c      **** else if(row==2 && col==1)
+ 263               		.loc 1 68 0
+ 264 0118 81E3      		ldi r24,lo8(49)
+ 265 011a 0895      		ret
+ 266               	.LVL17:
+ 267               	.L9:
+  51:keybad.c      ****  key='7';
+ 268               		.loc 1 51 0
+ 269 011c 2115      		cp r18,__zero_reg__
+ 270 011e 3105      		cpc r19,__zero_reg__
+ 271 0120 01F4      		brne .L67
+  58:keybad.c      **** else if(row==1 && col==0)
+ 272               		.loc 1 58 0
+ 273 0122 8FE2      		ldi r24,lo8(47)
+ 274 0124 0895      		ret
+ 275               	.LVL18:
+ 276               	.L60:
+  51:keybad.c      ****  key='7';
+ 277               		.loc 1 51 0
+ 278 0126 2115      		cp r18,__zero_reg__
+ 279 0128 3105      		cpc r19,__zero_reg__
+ 280 012a 01F0      		breq .L46
+  24:keybad.c      **** if((input & (1<<4))==0)
+ 281               		.loc 1 24 0
+ 282 012c 4FEF      		ldi r20,lo8(-1)
+ 283 012e 5FEF      		ldi r21,lo8(-1)
+ 284 0130 00C0      		rjmp .L18
+ 285               	.L8:
+ 286               	.LVL19:
+  51:keybad.c      ****  key='7';
+ 287               		.loc 1 51 0
+ 288 0132 2115      		cp r18,__zero_reg__
+ 289 0134 3105      		cpc r19,__zero_reg__
+ 290 0136 01F4      		brne .L68
+  56:keybad.c      **** else if(row==0 && col==3)
+ 291               		.loc 1 56 0
+ 292 0138 89E3      		ldi r24,lo8(57)
+ 293 013a 0895      		ret
+ 294               	.L68:
+  46:keybad.c      **** else if((input &(1<<3))==0)
+ 295               		.loc 1 46 0
+ 296 013c 42E0      		ldi r20,lo8(2)
+ 297 013e 50E0      		ldi r21,0
+ 298 0140 00C0      		rjmp .L18
+ 299               	.LVL20:
+ 300               	.L64:
+  61:keybad.c      **** key='5';
+ 301               		.loc 1 61 0
+ 302 0142 4130      		cpi r20,1
+ 303 0144 5105      		cpc r21,__zero_reg__
+ 304 0146 01F4      		brne .+2
+ 305 0148 00C0      		rjmp .L36
+  63:keybad.c      **** key='6';
+ 306               		.loc 1 63 0
+ 307 014a 4230      		cpi r20,2
+ 308 014c 5105      		cpc r21,__zero_reg__
+ 309 014e 01F0      		breq .L26
+  65:keybad.c      **** key='x';
+ 310               		.loc 1 65 0
+ 311 0150 4330      		cpi r20,3
+ 312 0152 5105      		cpc r21,__zero_reg__
+ 313 0154 01F0      		breq .+2
+ 314 0156 00C0      		rjmp .L12
+  66:keybad.c      **** else if(row==2 && col==0)
+ 315               		.loc 1 66 0
+ 316 0158 88E7      		ldi r24,lo8(120)
+ 317 015a 0895      		ret
+ 318               	.L65:
+  67:keybad.c      **** key='1';
+ 319               		.loc 1 67 0
+ 320 015c 4115      		cp r20,__zero_reg__
+ 321 015e 5105      		cpc r21,__zero_reg__
+ 322 0160 01F0      		breq .L40
+ 323 0162 00C0      		rjmp .L13
+ 324               	.L26:
+  64:keybad.c      **** else if(row==1 && col==3)
+ 325               		.loc 1 64 0
+ 326 0164 86E3      		ldi r24,lo8(54)
+ 327 0166 0895      		ret
+ 328               	.LVL21:
+ 329               	.L46:
+ 330               	.LBE7:
+  83:keybad.c      **** 
+  84:keybad.c      **** 
+  85:keybad.c      **** 
+  86:keybad.c      **** }
+  87:keybad.c      **** 
+  88:keybad.c      **** 
+  89:keybad.c      **** 
+  90:keybad.c      **** return key;
+  91:keybad.c      **** 
+  92:keybad.c      **** 
+  93:keybad.c      **** }
+ 331               		.loc 1 93 0
+ 332 0168 0895      		ret
+ 333               		.cfi_endproc
+ 334               	.LFE6:
+ 336               	.Letext0:
+ 337               		.file 3 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 keybad.c
+     /tmp/ccXxdomM.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccXxdomM.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccXxdomM.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccXxdomM.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccXxdomM.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccXxdomM.s:12     .text:0000000000000000 pressed_key
+
+NO UNDEFINED SYMBOLS

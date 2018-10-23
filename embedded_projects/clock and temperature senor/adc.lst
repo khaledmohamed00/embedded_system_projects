@@ -1,0 +1,135 @@
+   1               		.file	"adc.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	adc_init
+  12               	adc_init:
+  13               	.LFB6:
+  14               		.file 1 "adc.c"
+   1:adc.c         **** /*
+   2:adc.c         ****  * adc.c
+   3:adc.c         ****  *
+   4:adc.c         ****  * Created: 22-04-2017 5:54:02 PM
+   5:adc.c         ****  *  Author: Admin
+   6:adc.c         ****  */ 
+   7:adc.c         **** #include <avr/io.h>
+   8:adc.c         **** #include <avr/interrupt.h>
+   9:adc.c         **** #include <util/delay.h>
+  10:adc.c         **** 
+  11:adc.c         **** #include "adc.h"
+  12:adc.c         **** 
+  13:adc.c         **** void adc_init(void)
+  14:adc.c         **** {
+  15               		.loc 1 14 0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+  15:adc.c         **** 	// Vcc as voltage reference (bits76)
+  16:adc.c         **** 	// right adjustment [ADLAR] (bit5)
+  17:adc.c         **** 	// use ADC0 as input        (bits3210)
+  18:adc.c         **** 	//ADMUX = 0b01100000;
+  19:adc.c         **** 	ADMUX = 0b01000000;
+  21               		.loc 1 19 0
+  22 0000 80E4      		ldi r24,lo8(64)
+  23 0002 8093 7C00 		sts 124,r24
+  20:adc.c         **** 	// enable ADC           (bit7)
+  21:adc.c         **** 	// initialize ADC       (bit6)
+  22:adc.c         **** 	// no autotrigger       (bit5)
+  23:adc.c         **** 	// don't clear int-flag (bit4)
+  24:adc.c         **** 	// no interrupt         (bit3)
+  25:adc.c         **** 	// clock div by 64@8Mhz=125KHz (bit210) ADC should run at 50kHz to 200kHz, 1MHz gives decreased re
+  26:adc.c         **** 	ADCSRA = 0b10000011;
+  24               		.loc 1 26 0
+  25 0006 83E8      		ldi r24,lo8(-125)
+  26 0008 8093 7A00 		sts 122,r24
+  27 000c 0895      		ret
+  28               		.cfi_endproc
+  29               	.LFE6:
+  31               	.global	adc_read
+  33               	adc_read:
+  34               	.LFB7:
+  27:adc.c         **** 	//while(ADC_CSRA & (1<<ADC_SC));	// wait for first conversion to complete
+  28:adc.c         **** }
+  29:adc.c         **** 
+  30:adc.c         **** // read adc value
+  31:adc.c         **** unsigned int adc_read(unsigned char _ch)
+  32:adc.c         **** {
+  35               		.loc 1 32 0
+  36               		.cfi_startproc
+  37               	.LVL0:
+  38               	/* prologue: function */
+  39               	/* frame size = 0 */
+  40               	/* stack size = 0 */
+  41               	.L__stack_usage = 0
+  33:adc.c         **** 	static uint8_t low, high, tmp;
+  34:adc.c         **** 	// select the corresponding channel 0~7
+  35:adc.c         **** 	// ANDing with '7' will always keep the value
+  36:adc.c         **** 	// of 'ch' between 0 and 7
+  37:adc.c         **** 	// AREF = AVcc
+  38:adc.c         **** 	//ADC_MUX = MUX_REF_VCC | (_ch & 0x07);
+  39:adc.c         **** 	ADMUX = (ADMUX & 0xE0) | (_ch & 0x1F);
+  42               		.loc 1 39 0
+  43 000e 9091 7C00 		lds r25,124
+  44 0012 8F71      		andi r24,lo8(31)
+  45               	.LVL1:
+  46 0014 907E      		andi r25,lo8(-32)
+  47 0016 892B      		or r24,r25
+  48 0018 8093 7C00 		sts 124,r24
+  40:adc.c         **** 
+  41:adc.c         **** 	// start single conversion
+  42:adc.c         **** 	// write '1' to ADSC
+  43:adc.c         **** 	ADCSRA |= (1<<ADSC);
+  49               		.loc 1 43 0
+  50 001c 8091 7A00 		lds r24,122
+  51 0020 8064      		ori r24,lo8(64)
+  52 0022 8093 7A00 		sts 122,r24
+  53               	.L3:
+  44:adc.c         **** 	
+  45:adc.c         **** 	// wait for conversion to complete
+  46:adc.c         **** 	// ADSC becomes '0' again
+  47:adc.c         **** 	// till then, run loop continuously
+  48:adc.c         **** 	while((ADCSRA & (1<<ADSC)) != 0);
+  54               		.loc 1 48 0
+  55 0026 8091 7A00 		lds r24,122
+  56 002a 86FD      		sbrc r24,6
+  57 002c 00C0      		rjmp .L3
+  49:adc.c         **** 
+  50:adc.c         **** 	// we have to read ADCL first; doing so locks both ADCL
+  51:adc.c         **** 	// and ADCH until ADCH is read.  reading ADCL second would
+  52:adc.c         **** 	// cause the results of each conversion to be discarded,
+  53:adc.c         **** 	// as ADCL and ADCH would be locked when it completed.
+  54:adc.c         **** 	//low = ADCL;
+  55:adc.c         **** 	//high = ADCH;
+  56:adc.c         **** 
+  57:adc.c         **** 	// combine the two bytes
+  58:adc.c         **** 	//return (high << 8) | low;
+  59:adc.c         **** 	//return (ADCH);
+  60:adc.c         **** 	return (ADCW);
+  58               		.loc 1 60 0
+  59 002e 8091 7800 		lds r24,120
+  60 0032 9091 7900 		lds r25,120+1
+  61:adc.c         **** }
+  61               		.loc 1 61 0
+  62 0036 0895      		ret
+  63               		.cfi_endproc
+  64               	.LFE7:
+  66               	.Letext0:
+  67               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 adc.c
+     /tmp/ccPvTQf1.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccPvTQf1.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccPvTQf1.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccPvTQf1.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccPvTQf1.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccPvTQf1.s:12     .text:0000000000000000 adc_init
+     /tmp/ccPvTQf1.s:33     .text:000000000000000e adc_read
+
+NO UNDEFINED SYMBOLS

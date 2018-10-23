@@ -1,0 +1,337 @@
+
+main.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000110  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00000110  00000184  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000011  00000000  00000000  00000184  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000198  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000040  00000000  00000000  000001d4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   000002a9  00000000  00000000  00000214  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000000df  00000000  00000000  000004bd  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000000c7  00000000  00000000  0000059c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000108  00000000  00000000  00000664  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    0000021e  00000000  00000000  0000076c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000113  00000000  00000000  0000098a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	18 c0       	rjmp	.+48     	; 0x36 <__bad_interrupt>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+  14:	10 c0       	rjmp	.+32     	; 0x36 <__bad_interrupt>
+  16:	0f c0       	rjmp	.+30     	; 0x36 <__bad_interrupt>
+  18:	0e c0       	rjmp	.+28     	; 0x36 <__bad_interrupt>
+  1a:	0d c0       	rjmp	.+26     	; 0x36 <__bad_interrupt>
+  1c:	0c c0       	rjmp	.+24     	; 0x36 <__bad_interrupt>
+  1e:	0b c0       	rjmp	.+22     	; 0x36 <__bad_interrupt>
+  20:	0a c0       	rjmp	.+20     	; 0x36 <__bad_interrupt>
+  22:	09 c0       	rjmp	.+18     	; 0x36 <__bad_interrupt>
+  24:	08 c0       	rjmp	.+16     	; 0x36 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf e5       	ldi	r28, 0x5F	; 95
+  2c:	d4 e0       	ldi	r29, 0x04	; 4
+  2e:	de bf       	out	0x3e, r29	; 62
+  30:	cd bf       	out	0x3d, r28	; 61
+  32:	64 d0       	rcall	.+200    	; 0xfc <main>
+  34:	6b c0       	rjmp	.+214    	; 0x10c <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <i2c_init_master>:
+#include<i2c.h>
+#define get_bit(reg,bitnum) ((reg & (1<<bitnum))>>bitnum)
+
+void i2c_init_master(void){
+
+TWBR=BITRATE(TWSR=0x00);
+  38:	11 b8       	out	0x01, r1	; 1
+  3a:	82 e0       	ldi	r24, 0x02	; 2
+  3c:	80 b9       	out	0x00, r24	; 0
+TWCR|=(1<<TWEN);
+  3e:	86 b7       	in	r24, 0x36	; 54
+  40:	84 60       	ori	r24, 0x04	; 4
+  42:	86 bf       	out	0x36, r24	; 54
+  44:	08 95       	ret
+
+00000046 <i2c_start>:
+//TWBR=0x47 ;
+//TWCR=0x04 ;
+}
+void i2c_start(void){
+
+TWCR =(1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
+  46:	84 ea       	ldi	r24, 0xA4	; 164
+  48:	86 bf       	out	0x36, r24	; 54
+while((TWCR & (1<<TWINT))==0);
+  4a:	06 b6       	in	r0, 0x36	; 54
+  4c:	07 fe       	sbrs	r0, 7
+  4e:	fd cf       	rjmp	.-6      	; 0x4a <i2c_start+0x4>
+
+}
+  50:	08 95       	ret
+
+00000052 <i2c_stop>:
+
+void i2c_stop(void){
+TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWSTO);
+  52:	84 e9       	ldi	r24, 0x94	; 148
+  54:	86 bf       	out	0x36, r24	; 54
+  56:	08 95       	ret
+
+00000058 <i2c_write_master_ack>:
+
+}
+
+void i2c_write_master_ack(unsigned char data){
+TWDR=data;
+  58:	83 b9       	out	0x03, r24	; 3
+TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWSTA);
+  5a:	84 ea       	ldi	r24, 0xA4	; 164
+  5c:	86 bf       	out	0x36, r24	; 54
+while((TWCR & (1<<TWINT))==0);
+  5e:	06 b6       	in	r0, 0x36	; 54
+  60:	07 fe       	sbrs	r0, 7
+  62:	fd cf       	rjmp	.-6      	; 0x5e <i2c_write_master_ack+0x6>
+}
+  64:	08 95       	ret
+
+00000066 <i2c_read_master_ack>:
+
+
+unsigned char i2c_read_master_ack(unsigned char isLast){
+if(isLast==0)
+  66:	81 11       	cpse	r24, r1
+  68:	02 c0       	rjmp	.+4      	; 0x6e <i2c_read_master_ack+0x8>
+  TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  6a:	84 ec       	ldi	r24, 0xC4	; 196
+  6c:	01 c0       	rjmp	.+2      	; 0x70 <i2c_read_master_ack+0xa>
+else
+  TWCR=(1<<TWINT)|(1<<TWEN);
+  6e:	84 e8       	ldi	r24, 0x84	; 132
+  70:	86 bf       	out	0x36, r24	; 54
+
+while((TWCR & (1<<TWINT))==0);
+  72:	06 b6       	in	r0, 0x36	; 54
+  74:	07 fe       	sbrs	r0, 7
+  76:	fd cf       	rjmp	.-6      	; 0x72 <i2c_read_master_ack+0xc>
+return (TWDR);
+  78:	83 b1       	in	r24, 0x03	; 3
+
+}
+  7a:	08 95       	ret
+
+0000007c <i2c_init_slave>:
+
+void i2c_init_slave(unsigned char slaveAddress){
+
+TWCR=(1<<TWEN);
+  7c:	94 e0       	ldi	r25, 0x04	; 4
+  7e:	96 bf       	out	0x36, r25	; 54
+TWAR=slaveAddress;
+  80:	82 b9       	out	0x02, r24	; 2
+TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  82:	84 ec       	ldi	r24, 0xC4	; 196
+  84:	86 bf       	out	0x36, r24	; 54
+  86:	08 95       	ret
+
+00000088 <i2c_send_slave_ack>:
+
+}
+
+void i2c_send_slave_ack(unsigned char data)
+{
+TWDR=data;
+  88:	83 b9       	out	0x03, r24	; 3
+TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  8a:	84 ec       	ldi	r24, 0xC4	; 196
+  8c:	86 bf       	out	0x36, r24	; 54
+while((TWCR & (1<<TWINT))==0);
+  8e:	06 b6       	in	r0, 0x36	; 54
+  90:	07 fe       	sbrs	r0, 7
+  92:	fd cf       	rjmp	.-6      	; 0x8e <i2c_send_slave_ack+0x6>
+
+}
+  94:	08 95       	ret
+
+00000096 <i2c_receive_slave_ack>:
+
+unsigned char i2c_receive_slave_ack(unsigned char isLast){
+if(isLast==0)
+  96:	81 11       	cpse	r24, r1
+  98:	02 c0       	rjmp	.+4      	; 0x9e <i2c_receive_slave_ack+0x8>
+  TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  9a:	84 ec       	ldi	r24, 0xC4	; 196
+  9c:	01 c0       	rjmp	.+2      	; 0xa0 <i2c_receive_slave_ack+0xa>
+else
+  TWCR=(1<<TWINT)|(1<<TWEN);
+  9e:	84 e8       	ldi	r24, 0x84	; 132
+  a0:	86 bf       	out	0x36, r24	; 54
+
+while((TWCR & (1<<TWINT))==0);
+  a2:	06 b6       	in	r0, 0x36	; 54
+  a4:	07 fe       	sbrs	r0, 7
+  a6:	fd cf       	rjmp	.-6      	; 0xa2 <i2c_receive_slave_ack+0xc>
+return (TWDR);
+  a8:	83 b1       	in	r24, 0x03	; 3
+
+}
+  aa:	08 95       	ret
+
+000000ac <i2c_listen_slave>:
+
+void i2c_listen_slave(void){
+
+while((TWCR & (1<<TWINT))==0);
+  ac:	06 b6       	in	r0, 0x36	; 54
+  ae:	07 fe       	sbrs	r0, 7
+  b0:	fd cf       	rjmp	.-6      	; 0xac <i2c_listen_slave>
+}
+  b2:	08 95       	ret
+
+000000b4 <i2c_write_master_nack>:
+
+void i2c_write_master_nack(unsigned char data){
+/*TWDR=data;
+TWCR=(1<<TWINT)|(1<<TWEN);
+while((TWCR & (1<<TWINT))==0);*/
+TWDR=data;
+  b4:	83 b9       	out	0x03, r24	; 3
+
+       TWCR= (1<<TWINT)|(1<<TWEN);
+  b6:	84 e8       	ldi	r24, 0x84	; 132
+  b8:	86 bf       	out	0x36, r24	; 54
+
+       while (get_bit(TWCR,TWINT)==0)
+  ba:	06 b6       	in	r0, 0x36	; 54
+  bc:	07 fe       	sbrs	r0, 7
+  be:	fd cf       	rjmp	.-6      	; 0xba <i2c_write_master_nack+0x6>
+
+       {
+
+       }
+
+}
+  c0:	08 95       	ret
+
+000000c2 <i2c_read_master_nack>:
+
+
+unsigned char i2c_read_master_nack(unsigned char isLast){
+if(isLast==0)
+  c2:	81 11       	cpse	r24, r1
+  c4:	02 c0       	rjmp	.+4      	; 0xca <i2c_read_master_nack+0x8>
+  TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  c6:	84 ec       	ldi	r24, 0xC4	; 196
+  c8:	01 c0       	rjmp	.+2      	; 0xcc <i2c_read_master_nack+0xa>
+else
+  TWCR=(1<<TWINT)|(1<<TWEN);
+  ca:	84 e8       	ldi	r24, 0x84	; 132
+  cc:	86 bf       	out	0x36, r24	; 54
+
+while((TWCR & (1<<TWINT))==0);
+  ce:	06 b6       	in	r0, 0x36	; 54
+  d0:	07 fe       	sbrs	r0, 7
+  d2:	fd cf       	rjmp	.-6      	; 0xce <i2c_read_master_nack+0xc>
+return (TWDR);
+  d4:	83 b1       	in	r24, 0x03	; 3
+
+}
+  d6:	08 95       	ret
+
+000000d8 <i2c_send_slave_nack>:
+
+void i2c_send_slave_nack(unsigned char data)
+{
+TWDR=data;
+  d8:	83 b9       	out	0x03, r24	; 3
+TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  da:	84 ec       	ldi	r24, 0xC4	; 196
+  dc:	86 bf       	out	0x36, r24	; 54
+while((TWCR & (1<<TWINT))==0);
+  de:	06 b6       	in	r0, 0x36	; 54
+  e0:	07 fe       	sbrs	r0, 7
+  e2:	fd cf       	rjmp	.-6      	; 0xde <i2c_send_slave_nack+0x6>
+
+}
+  e4:	08 95       	ret
+
+000000e6 <i2c_receive_slave_nack>:
+
+unsigned char i2c_receive_slave_nack(unsigned char isLast){
+if(isLast==0)
+  e6:	81 11       	cpse	r24, r1
+  e8:	02 c0       	rjmp	.+4      	; 0xee <i2c_receive_slave_nack+0x8>
+  TWCR=(1<<TWINT)|(1<<TWEN)|(1<<TWEA);
+  ea:	84 ec       	ldi	r24, 0xC4	; 196
+  ec:	01 c0       	rjmp	.+2      	; 0xf0 <i2c_receive_slave_nack+0xa>
+else
+  TWCR=(1<<TWINT)|(1<<TWEN);
+  ee:	84 e8       	ldi	r24, 0x84	; 132
+  f0:	86 bf       	out	0x36, r24	; 54
+
+while((TWCR & (1<<TWINT))==0);
+  f2:	06 b6       	in	r0, 0x36	; 54
+  f4:	07 fe       	sbrs	r0, 7
+  f6:	fd cf       	rjmp	.-6      	; 0xf2 <i2c_receive_slave_nack+0xc>
+return (TWDR);
+  f8:	83 b1       	in	r24, 0x03	; 3
+
+}
+  fa:	08 95       	ret
+
+000000fc <main>:
+#include<i2c.h>
+
+
+int main(void){
+
+i2c_init_master();
+  fc:	9d df       	rcall	.-198    	; 0x38 <i2c_init_master>
+
+i2c_start();
+  fe:	a3 df       	rcall	.-186    	; 0x46 <i2c_start>
+i2c_write_master_ack(0b11010000);
+ 100:	80 ed       	ldi	r24, 0xD0	; 208
+ 102:	aa df       	rcall	.-172    	; 0x58 <i2c_write_master_ack>
+i2c_write_master_ack(0b11110000);
+ 104:	80 ef       	ldi	r24, 0xF0	; 240
+ 106:	a8 df       	rcall	.-176    	; 0x58 <i2c_write_master_ack>
+i2c_stop();
+ 108:	a4 df       	rcall	.-184    	; 0x52 <i2c_stop>
+
+
+while(1){
+
+}
+ 10a:	ff cf       	rjmp	.-2      	; 0x10a <main+0xe>
+
+0000010c <_exit>:
+ 10c:	f8 94       	cli
+
+0000010e <__stop_program>:
+ 10e:	ff cf       	rjmp	.-2      	; 0x10e <__stop_program>

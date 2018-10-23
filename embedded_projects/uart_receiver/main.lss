@@ -1,0 +1,171 @@
+
+main.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000082  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00000082  000000f6  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000011  00000000  00000000  000000f6  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000108  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000040  00000000  00000000  00000144  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   000001c6  00000000  00000000  00000184  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 0000014d  00000000  00000000  0000034a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000000e6  00000000  00000000  00000497  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000068  00000000  00000000  00000580  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000001a0  00000000  00000000  000005e8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000013  00000000  00000000  00000788  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	18 c0       	rjmp	.+48     	; 0x36 <__bad_interrupt>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+  14:	10 c0       	rjmp	.+32     	; 0x36 <__bad_interrupt>
+  16:	0f c0       	rjmp	.+30     	; 0x36 <__bad_interrupt>
+  18:	0e c0       	rjmp	.+28     	; 0x36 <__bad_interrupt>
+  1a:	0d c0       	rjmp	.+26     	; 0x36 <__bad_interrupt>
+  1c:	0c c0       	rjmp	.+24     	; 0x36 <__bad_interrupt>
+  1e:	0b c0       	rjmp	.+22     	; 0x36 <__bad_interrupt>
+  20:	0a c0       	rjmp	.+20     	; 0x36 <__bad_interrupt>
+  22:	09 c0       	rjmp	.+18     	; 0x36 <__bad_interrupt>
+  24:	08 c0       	rjmp	.+16     	; 0x36 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf e5       	ldi	r28, 0x5F	; 95
+  2c:	d4 e0       	ldi	r29, 0x04	; 4
+  2e:	de bf       	out	0x3e, r29	; 62
+  30:	cd bf       	out	0x3d, r28	; 61
+  32:	14 d0       	rcall	.+40     	; 0x5c <main>
+  34:	24 c0       	rjmp	.+72     	; 0x7e <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <uart_init>:
+#include "uart.h"
+
+#define UBBRValue ((F_CPU/Baud_rate)-1)
+
+void uart_init(void){
+DDRD|=(1<<DDD1);
+  38:	89 9a       	sbi	0x11, 1	; 17
+DDRD&=~(1<<DDD0);
+  3a:	88 98       	cbi	0x11, 0	; 17
+UBRRH=(unsigned char)(UBBRValue>>8);
+  3c:	10 bc       	out	0x20, r1	; 32
+UBRRL=(unsigned char)UBBRValue;
+  3e:	87 e6       	ldi	r24, 0x67	; 103
+  40:	89 b9       	out	0x09, r24	; 9
+UCSRB=(1<<RXEN)|(1<<TXEN);
+  42:	88 e1       	ldi	r24, 0x18	; 24
+  44:	8a b9       	out	0x0a, r24	; 10
+UCSRC=(1<<USBS)|(3<<UCSZ0);
+  46:	8e e0       	ldi	r24, 0x0E	; 14
+  48:	80 bd       	out	0x20, r24	; 32
+  4a:	08 95       	ret
+
+0000004c <uart_send_char>:
+
+
+}
+
+void uart_send_char(unsigned char c){
+while(!(UCSRA & (1<<UDRE)));
+  4c:	5d 9b       	sbis	0x0b, 5	; 11
+  4e:	fe cf       	rjmp	.-4      	; 0x4c <uart_send_char>
+
+      UDR=c;
+  50:	8c b9       	out	0x0c, r24	; 12
+  52:	08 95       	ret
+
+00000054 <uart_receive_char>:
+
+}
+
+unsigned char uart_receive_char(void){
+while(!(UCSRA & (1<<RXC)));
+  54:	5f 9b       	sbis	0x0b, 7	; 11
+  56:	fe cf       	rjmp	.-4      	; 0x54 <uart_receive_char>
+return UDR;
+  58:	8c b1       	in	r24, 0x0c	; 12
+}
+  5a:	08 95       	ret
+
+0000005c <main>:
+#include<avr/io.h>
+#include<util/delay.h>
+#include "uart.h"
+
+int main(void){
+DDRC=(1<<DDC0);
+  5c:	81 e0       	ldi	r24, 0x01	; 1
+  5e:	84 bb       	out	0x14, r24	; 20
+UBRRH=(unsigned char)(UBRR_value>>8);
+UBRRL=(unsigned char)UBRR_value;
+
+UCSRB=(1<<RXEN)|(1<<TXEN);
+UCSRC=(1<<USBS)|(3<<UCSZ0);*/
+uart_init();
+  60:	eb df       	rcall	.-42     	; 0x38 <uart_init>
+  /*while(!(UCSRA & (1<<RXC)));*/
+
+  receiveData=uart_receive_char();
+  if(receiveData==0b11110000)
+  {
+    PORTC^=(1<<PINC0);
+  62:	c1 e0       	ldi	r28, 0x01	; 1
+unsigned char receiveData;
+while(1){
+    
+  /*while(!(UCSRA & (1<<RXC)));*/
+
+  receiveData=uart_receive_char();
+  64:	f7 df       	rcall	.-18     	; 0x54 <uart_receive_char>
+  if(receiveData==0b11110000)
+  66:	80 3f       	cpi	r24, 0xF0	; 240
+  68:	e9 f7       	brne	.-6      	; 0x64 <main+0x8>
+  {
+    PORTC^=(1<<PINC0);
+  6a:	85 b3       	in	r24, 0x15	; 21
+  6c:	8c 27       	eor	r24, r28
+  6e:	85 bb       	out	0x15, r24	; 21
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  70:	8f e4       	ldi	r24, 0x4F	; 79
+  72:	93 ec       	ldi	r25, 0xC3	; 195
+  74:	01 97       	sbiw	r24, 0x01	; 1
+  76:	f1 f7       	brne	.-4      	; 0x74 <main+0x18>
+  78:	00 c0       	rjmp	.+0      	; 0x7a <main+0x1e>
+  7a:	00 00       	nop
+  7c:	f3 cf       	rjmp	.-26     	; 0x64 <main+0x8>
+
+0000007e <_exit>:
+  7e:	f8 94       	cli
+
+00000080 <__stop_program>:
+  80:	ff cf       	rjmp	.-2      	; 0x80 <__stop_program>

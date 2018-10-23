@@ -1,0 +1,77 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.startup,"ax",@progbits
+  11               	.global	main
+  13               	main:
+  14               	.LFB6:
+  15               		.file 1 "main.c"
+   1:main.c        **** #define F_CPU 1000000
+   2:main.c        **** #include<avr/io.h>
+   3:main.c        **** #include<util/delay.h>
+   4:main.c        **** #include<i2c.h>
+   5:main.c        **** 
+   6:main.c        **** 
+   7:main.c        **** int main(void){
+  16               		.loc 1 7 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+   8:main.c        **** 
+   9:main.c        **** i2c_init_master();
+  22               		.loc 1 9 0
+  23 0000 00D0      		rcall i2c_init_master
+  24               	.LVL0:
+  10:main.c        **** 
+  11:main.c        **** i2c_start();
+  25               		.loc 1 11 0
+  26 0002 00D0      		rcall i2c_start
+  27               	.LVL1:
+  12:main.c        **** i2c_write_master_ack(0b11010000);
+  28               		.loc 1 12 0
+  29 0004 80ED      		ldi r24,lo8(-48)
+  30 0006 00D0      		rcall i2c_write_master_ack
+  31               	.LVL2:
+  13:main.c        **** i2c_write_master_ack(0b11110000);
+  32               		.loc 1 13 0
+  33 0008 80EF      		ldi r24,lo8(-16)
+  34 000a 00D0      		rcall i2c_write_master_ack
+  35               	.LVL3:
+  14:main.c        **** i2c_stop();
+  36               		.loc 1 14 0
+  37 000c 00D0      		rcall i2c_stop
+  38               	.LVL4:
+  39               	.L2:
+  15:main.c        **** 
+  16:main.c        **** 
+  17:main.c        **** while(1){
+  18:main.c        **** 
+  19:main.c        **** }
+  40               		.loc 1 19 0
+  41 000e 00C0      		rjmp .L2
+  42               		.cfi_endproc
+  43               	.LFE6:
+  45               		.text
+  46               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cco5bRzr.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cco5bRzr.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cco5bRzr.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cco5bRzr.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cco5bRzr.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cco5bRzr.s:13     .text.startup:0000000000000000 main
+
+UNDEFINED SYMBOLS
+i2c_init_master
+i2c_start
+i2c_write_master_ack
+i2c_stop

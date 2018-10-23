@@ -1,0 +1,439 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.rodata.str1.1,"aMS",@progbits,1
+  11               	.LC0:
+  12 0000 6475 7479 		.string	"duty_cycle=%u %\n"
+  12      5F63 7963 
+  12      6C65 3D25 
+  12      7520 250A 
+  12      00
+  13               	.LC1:
+  14 0011 6672 6571 		.string	"freq=%u HZ\n"
+  14      3D25 7520 
+  14      485A 0A00 
+  15               		.section	.text.startup,"ax",@progbits
+  16               	.global	main
+  18               	main:
+  19               	.LFB11:
+  20               		.file 1 "main.c"
+   1:main.c        **** #include<avr/io.h>
+   2:main.c        **** #include<avr/interrupt.h>
+   3:main.c        **** #include<util/delay.h>
+   4:main.c        **** #include <stdio.h>
+   5:main.c        **** #include<uart.h>
+   6:main.c        **** #include<debug.h>
+   7:main.c        **** #include<stdlib.h>
+   8:main.c        **** volatile uint16_t history=0;
+   9:main.c        **** volatile uint16_t recent=0; 
+  10:main.c        **** volatile uint16_t period=0; 
+  11:main.c        **** FILE usart_str = FDEV_SETUP_STREAM(USARTSendByte, USARTReceiveByte, _FDEV_SETUP_RW);
+  12:main.c        **** int main(void){
+  21               		.loc 1 12 0
+  22               		.cfi_startproc
+  23               	/* prologue: function */
+  24               	/* frame size = 0 */
+  25               	/* stack size = 0 */
+  26               	.L__stack_usage = 0
+  13:main.c        **** 
+  14:main.c        **** DDRB|=(1<<1)|(1<<3);//set pin 1 and 3 as output
+  27               		.loc 1 14 0
+  28 0000 87B3      		in r24,0x17
+  29 0002 8A60      		ori r24,lo8(10)
+  30 0004 87BB      		out 0x17,r24
+  15:main.c        **** 
+  16:main.c        **** TCCR1A=0x00;//normal mode timer 1
+  31               		.loc 1 16 0
+  32 0006 1FBC      		out 0x2f,__zero_reg__
+  17:main.c        **** TCCR1B|=(1<<CS10)|(1<<CS11);//prescaler 64 timer 1
+  33               		.loc 1 17 0
+  34 0008 8EB5      		in r24,0x2e
+  35 000a 8360      		ori r24,lo8(3)
+  36 000c 8EBD      		out 0x2e,r24
+  18:main.c        **** TCCR1B|=(1<<ICES1);//Capture on rissing edge timer 1
+  37               		.loc 1 18 0
+  38 000e 8EB5      		in r24,0x2e
+  39 0010 8064      		ori r24,lo8(64)
+  40 0012 8EBD      		out 0x2e,r24
+  19:main.c        **** 
+  20:main.c        **** 
+  21:main.c        **** TCCR2|=(1<<COM21)|(1<<WGM20); //toggle oc2 in compare match OCR2 and phase correct mode  timer 2
+  41               		.loc 1 21 0
+  42 0014 85B5      		in r24,0x25
+  43 0016 8066      		ori r24,lo8(96)
+  44 0018 85BD      		out 0x25,r24
+  22:main.c        **** 
+  23:main.c        **** TCCR2|=(1<<CS20)|(1<<CS21);//prescaler 64
+  45               		.loc 1 23 0
+  46 001a 85B5      		in r24,0x25
+  47 001c 8360      		ori r24,lo8(3)
+  48 001e 85BD      		out 0x25,r24
+  24:main.c        **** 
+  25:main.c        **** 
+  26:main.c        **** OCR2=0x5f; //to control duty cycle
+  49               		.loc 1 26 0
+  50 0020 8FE5      		ldi r24,lo8(95)
+  51 0022 83BD      		out 0x23,r24
+  27:main.c        **** //TIMSK|=(1<<TICIE1)|(1<<OCIE1A);
+  28:main.c        **** uart_init();//initiate uart
+  52               		.loc 1 28 0
+  53 0024 00D0      		rcall uart_init
+  29:main.c        **** stdin=stdout = &usart_str; // input /out stream
+  54               		.loc 1 29 0
+  55 0026 80E0      		ldi r24,lo8(usart_str)
+  56 0028 90E0      		ldi r25,hi8(usart_str)
+  57 002a 9093 0000 		sts __iob+2+1,r25
+  58 002e 8093 0000 		sts __iob+2,r24
+  59 0032 9093 0000 		sts __iob+1,r25
+  60 0036 8093 0000 		sts __iob,r24
+  30:main.c        **** //sei();
+  31:main.c        **** uint16_t a,b,c;
+  32:main.c        **** uint8_t duty_cycle;
+  33:main.c        **** while(1){
+  34:main.c        **** TCNT1=0;
+  35:main.c        **** 
+  36:main.c        **** while((TIFR &(1<<ICF1))==0);//check input capture flag
+  37:main.c        **** a=TCNT1;
+  38:main.c        **** TCCR1B&=~(1<<ICES1);//Capture on falling edge
+  39:main.c        **** TIFR|=(1<<ICF1);    //reset flag 
+  40:main.c        **** while((TIFR &(1<<ICF1))==0);//check input capture flag
+  41:main.c        **** b=TCNT1;
+  42:main.c        **** TCCR1B|=(1<<ICES1);//Capture on rissing edge
+  43:main.c        **** TIFR|=(1<<ICF1);//reset flag 
+  44:main.c        **** while((TIFR &(1<<ICF1))==0);//check input capture flag
+  45:main.c        **** c=TCNT1;
+  46:main.c        **** TIFR|=(1<<ICF1);//reset flag 
+  47:main.c        **** 
+  48:main.c        **** if(c>b && b>a){
+  49:main.c        **** duty_cycle=(uint8_t)100*(b-a)/(c-a);
+  61               		.loc 1 49 0
+  62 003a 94E6      		ldi r25,lo8(100)
+  63 003c D92E      		mov r13,r25
+  50:main.c        **** printf("duty_cycle=%u %\n",duty_cycle);
+  64               		.loc 1 50 0
+  65 003e 00E0      		ldi r16,lo8(.LC0)
+  66 0040 10E0      		ldi r17,hi8(.LC0)
+  51:main.c        **** printf("freq=%u HZ\n",F_CPU/(64*(c-a)));
+  67               		.loc 1 51 0
+  68 0042 812C      		mov r8,__zero_reg__
+  69 0044 22E1      		ldi r18,lo8(18)
+  70 0046 922E      		mov r9,r18
+  71 0048 2AE7      		ldi r18,lo8(122)
+  72 004a A22E      		mov r10,r18
+  73 004c B12C      		mov r11,__zero_reg__
+  74 004e 30E0      		ldi r19,lo8(.LC1)
+  75 0050 E32E      		mov r14,r19
+  76 0052 30E0      		ldi r19,hi8(.LC1)
+  77 0054 F32E      		mov r15,r19
+  78               	.L6:
+  34:main.c        **** 
+  79               		.loc 1 34 0
+  80 0056 1DBC      		out 0x2c+1,__zero_reg__
+  81 0058 1CBC      		out 0x2c,__zero_reg__
+  82               	.L2:
+  36:main.c        **** a=TCNT1;
+  83               		.loc 1 36 0
+  84 005a 08B6      		in __tmp_reg__,0x38
+  85 005c 05FE      		sbrs __tmp_reg__,5
+  86 005e 00C0      		rjmp .L2
+  37:main.c        **** TCCR1B&=~(1<<ICES1);//Capture on falling edge
+  87               		.loc 1 37 0
+  88 0060 4CB5      		in r20,0x2c
+  89 0062 5DB5      		in r21,0x2c+1
+  38:main.c        **** TIFR|=(1<<ICF1);    //reset flag 
+  90               		.loc 1 38 0
+  91 0064 8EB5      		in r24,0x2e
+  92 0066 8F7B      		andi r24,lo8(-65)
+  93 0068 8EBD      		out 0x2e,r24
+  39:main.c        **** while((TIFR &(1<<ICF1))==0);//check input capture flag
+  94               		.loc 1 39 0
+  95 006a 88B7      		in r24,0x38
+  96 006c 8062      		ori r24,lo8(32)
+  97 006e 88BF      		out 0x38,r24
+  98               	.L3:
+  40:main.c        **** b=TCNT1;
+  99               		.loc 1 40 0
+ 100 0070 08B6      		in __tmp_reg__,0x38
+ 101 0072 05FE      		sbrs __tmp_reg__,5
+ 102 0074 00C0      		rjmp .L3
+  41:main.c        **** TCCR1B|=(1<<ICES1);//Capture on rissing edge
+ 103               		.loc 1 41 0
+ 104 0076 8CB5      		in r24,0x2c
+ 105 0078 9DB5      		in r25,0x2c+1
+  42:main.c        **** TIFR|=(1<<ICF1);//reset flag 
+ 106               		.loc 1 42 0
+ 107 007a 2EB5      		in r18,0x2e
+ 108 007c 2064      		ori r18,lo8(64)
+ 109 007e 2EBD      		out 0x2e,r18
+  43:main.c        **** while((TIFR &(1<<ICF1))==0);//check input capture flag
+ 110               		.loc 1 43 0
+ 111 0080 28B7      		in r18,0x38
+ 112 0082 2062      		ori r18,lo8(32)
+ 113 0084 28BF      		out 0x38,r18
+ 114               	.L4:
+  44:main.c        **** c=TCNT1;
+ 115               		.loc 1 44 0
+ 116 0086 08B6      		in __tmp_reg__,0x38
+ 117 0088 05FE      		sbrs __tmp_reg__,5
+ 118 008a 00C0      		rjmp .L4
+  45:main.c        **** TIFR|=(1<<ICF1);//reset flag 
+ 119               		.loc 1 45 0
+ 120 008c CCB5      		in r28,0x2c
+ 121 008e DDB5      		in r29,0x2c+1
+  46:main.c        **** 
+ 122               		.loc 1 46 0
+ 123 0090 38B7      		in r19,0x38
+ 124 0092 3062      		ori r19,lo8(32)
+ 125 0094 38BF      		out 0x38,r19
+  48:main.c        **** duty_cycle=(uint8_t)100*(b-a)/(c-a);
+ 126               		.loc 1 48 0
+ 127 0096 8C17      		cp r24,r28
+ 128 0098 9D07      		cpc r25,r29
+ 129 009a 00F4      		brsh .L5
+  48:main.c        **** duty_cycle=(uint8_t)100*(b-a)/(c-a);
+ 130               		.loc 1 48 0 is_stmt 0
+ 131 009c 4817      		cp r20,r24
+ 132 009e 5907      		cpc r21,r25
+ 133 00a0 00F4      		brsh .L5
+  49:main.c        **** printf("duty_cycle=%u %\n",duty_cycle);
+ 134               		.loc 1 49 0 is_stmt 1
+ 135 00a2 C41B      		sub r28,r20
+ 136 00a4 D50B      		sbc r29,r21
+ 137 00a6 9C01      		movw r18,r24
+ 138 00a8 241B      		sub r18,r20
+ 139 00aa 350B      		sbc r19,r21
+ 140 00ac D29E      		mul r13,r18
+ 141 00ae C001      		movw r24,r0
+ 142 00b0 D39E      		mul r13,r19
+ 143 00b2 900D      		add r25,r0
+ 144 00b4 1124      		clr __zero_reg__
+ 145 00b6 BE01      		movw r22,r28
+ 146 00b8 00D0      		rcall __udivmodhi4
+ 147 00ba 7727      		clr r23
+  50:main.c        **** printf("freq=%u HZ\n",F_CPU/(64*(c-a)));
+ 148               		.loc 1 50 0
+ 149 00bc 7F93      		push r23
+ 150               	.LCFI0:
+ 151               		.cfi_def_cfa_offset 3
+ 152 00be 6F93      		push r22
+ 153               	.LCFI1:
+ 154               		.cfi_def_cfa_offset 4
+ 155 00c0 1F93      		push r17
+ 156               	.LCFI2:
+ 157               		.cfi_def_cfa_offset 5
+ 158 00c2 0F93      		push r16
+ 159               	.LCFI3:
+ 160               		.cfi_def_cfa_offset 6
+ 161 00c4 00D0      		rcall printf
+ 162               		.loc 1 51 0
+ 163 00c6 9E01      		movw r18,r28
+ 164 00c8 86E0      		ldi r24,6
+ 165               		1:
+ 166 00ca 220F      		lsl r18
+ 167 00cc 331F      		rol r19
+ 168 00ce 8A95      		dec r24
+ 169 00d0 01F4      		brne 1b
+ 170 00d2 40E0      		ldi r20,0
+ 171 00d4 50E0      		ldi r21,0
+ 172 00d6 C501      		movw r24,r10
+ 173 00d8 B401      		movw r22,r8
+ 174 00da 00D0      		rcall __udivmodsi4
+ 175 00dc 5F93      		push r21
+ 176               	.LCFI4:
+ 177               		.cfi_def_cfa_offset 7
+ 178 00de 4F93      		push r20
+ 179               	.LCFI5:
+ 180               		.cfi_def_cfa_offset 8
+ 181 00e0 3F93      		push r19
+ 182               	.LCFI6:
+ 183               		.cfi_def_cfa_offset 9
+ 184 00e2 2F93      		push r18
+ 185               	.LCFI7:
+ 186               		.cfi_def_cfa_offset 10
+ 187 00e4 FF92      		push r15
+ 188               	.LCFI8:
+ 189               		.cfi_def_cfa_offset 11
+ 190 00e6 EF92      		push r14
+ 191               	.LCFI9:
+ 192               		.cfi_def_cfa_offset 12
+ 193 00e8 00D0      		rcall printf
+ 194 00ea 8DB7      		in r24,__SP_L__
+ 195 00ec 9EB7      		in r25,__SP_H__
+ 196 00ee 0A96      		adiw r24,10
+ 197 00f0 0FB6      		in __tmp_reg__,__SREG__
+ 198 00f2 F894      		cli
+ 199 00f4 9EBF      		out __SP_H__,r25
+ 200 00f6 0FBE      		out __SREG__,__tmp_reg__
+ 201 00f8 8DBF      		out __SP_L__,r24
+ 202               	.LCFI10:
+ 203               		.cfi_def_cfa_offset 2
+ 204               	.L5:
+  52:main.c        **** }
+  53:main.c        **** 
+  54:main.c        **** TCNT1=0;
+ 205               		.loc 1 54 0
+ 206 00fa 1DBC      		out 0x2c+1,__zero_reg__
+ 207 00fc 1CBC      		out 0x2c,__zero_reg__
+  55:main.c        **** }
+ 208               		.loc 1 55 0
+ 209 00fe 00C0      		rjmp .L6
+ 210               		.cfi_endproc
+ 211               	.LFE11:
+ 213               		.text
+ 214               	.global	__vector_5
+ 216               	__vector_5:
+ 217               	.LFB12:
+  56:main.c        **** 
+  57:main.c        **** }
+  58:main.c        **** 
+  59:main.c        **** //ISR for input capture
+  60:main.c        **** ISR(TIMER1_CAPT_vect){
+ 218               		.loc 1 60 0
+ 219               		.cfi_startproc
+ 220 0000 1F92      		push r1
+ 221               	.LCFI11:
+ 222               		.cfi_def_cfa_offset 3
+ 223               		.cfi_offset 1, -2
+ 224 0002 0F92      		push r0
+ 225               	.LCFI12:
+ 226               		.cfi_def_cfa_offset 4
+ 227               		.cfi_offset 0, -3
+ 228 0004 0FB6      		in r0,__SREG__
+ 229 0006 0F92      		push r0
+ 230 0008 1124      		clr __zero_reg__
+ 231 000a 2F93      		push r18
+ 232               	.LCFI13:
+ 233               		.cfi_def_cfa_offset 5
+ 234               		.cfi_offset 18, -4
+ 235 000c 3F93      		push r19
+ 236               	.LCFI14:
+ 237               		.cfi_def_cfa_offset 6
+ 238               		.cfi_offset 19, -5
+ 239 000e 8F93      		push r24
+ 240               	.LCFI15:
+ 241               		.cfi_def_cfa_offset 7
+ 242               		.cfi_offset 24, -6
+ 243 0010 9F93      		push r25
+ 244               	.LCFI16:
+ 245               		.cfi_def_cfa_offset 8
+ 246               		.cfi_offset 25, -7
+ 247               	/* prologue: Signal */
+ 248               	/* frame size = 0 */
+ 249               	/* stack size = 7 */
+ 250               	.L__stack_usage = 7
+  61:main.c        **** if (history==0)
+ 251               		.loc 1 61 0
+ 252 0012 8091 0000 		lds r24,history
+ 253 0016 9091 0000 		lds r25,history+1
+ 254 001a 892B      		or r24,r25
+ 255 001c 01F4      		brne .L15
+  62:main.c        ****   history=ICR1;
+ 256               		.loc 1 62 0
+ 257 001e 86B5      		in r24,0x26
+ 258 0020 97B5      		in r25,0x26+1
+ 259 0022 00C0      		rjmp .L17
+ 260               	.L15:
+  63:main.c        **** else{
+  64:main.c        **** recent=ICR1;
+ 261               		.loc 1 64 0
+ 262 0024 86B5      		in r24,0x26
+ 263 0026 97B5      		in r25,0x26+1
+ 264 0028 9093 0000 		sts recent+1,r25
+ 265 002c 8093 0000 		sts recent,r24
+  65:main.c        **** if(recent-history>0){
+ 266               		.loc 1 65 0
+ 267 0030 2091 0000 		lds r18,recent
+ 268 0034 3091 0000 		lds r19,recent+1
+ 269 0038 8091 0000 		lds r24,history
+ 270 003c 9091 0000 		lds r25,history+1
+ 271 0040 2817      		cp r18,r24
+ 272 0042 3907      		cpc r19,r25
+ 273 0044 01F0      		breq .L14
+  66:main.c        **** period=recent-history;
+ 274               		.loc 1 66 0
+ 275 0046 8091 0000 		lds r24,recent
+ 276 004a 9091 0000 		lds r25,recent+1
+ 277 004e 2091 0000 		lds r18,history
+ 278 0052 3091 0000 		lds r19,history+1
+ 279 0056 821B      		sub r24,r18
+ 280 0058 930B      		sbc r25,r19
+ 281 005a 9093 0000 		sts period+1,r25
+ 282 005e 8093 0000 		sts period,r24
+  67:main.c        **** history=recent;
+ 283               		.loc 1 67 0
+ 284 0062 8091 0000 		lds r24,recent
+ 285 0066 9091 0000 		lds r25,recent+1
+ 286               	.L17:
+ 287 006a 9093 0000 		sts history+1,r25
+ 288 006e 8093 0000 		sts history,r24
+ 289               	.L14:
+ 290               	/* epilogue start */
+  68:main.c        ****                     }
+  69:main.c        **** 
+  70:main.c        ****      }
+  71:main.c        **** }
+ 291               		.loc 1 71 0
+ 292 0072 9F91      		pop r25
+ 293 0074 8F91      		pop r24
+ 294 0076 3F91      		pop r19
+ 295 0078 2F91      		pop r18
+ 296 007a 0F90      		pop r0
+ 297 007c 0FBE      		out __SREG__,r0
+ 298 007e 0F90      		pop r0
+ 299 0080 1F90      		pop r1
+ 300 0082 1895      		reti
+ 301               		.cfi_endproc
+ 302               	.LFE12:
+ 304               	.global	usart_str
+ 305               		.data
+ 308               	usart_str:
+ 309 0000 0000 00   		.zero	3
+ 310 0003 03        		.byte	3
+ 311 0004 0000 0000 		.zero	4
+ 312 0008 0000      		.word	gs(USARTSendByte)
+ 313 000a 0000      		.word	gs(USARTReceiveByte)
+ 314 000c 0000      		.word	0
+ 315               	.global	period
+ 316               		.section .bss
+ 319               	period:
+ 320 0000 0000      		.zero	2
+ 321               	.global	recent
+ 324               	recent:
+ 325 0002 0000      		.zero	2
+ 326               	.global	history
+ 329               	history:
+ 330 0004 0000      		.zero	2
+ 331               		.text
+ 332               	.Letext0:
+ 333               		.file 2 "/usr/lib/avr/include/stdint.h"
+ 334               		.file 3 "/usr/lib/avr/include/stdio.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccAN3Jav.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccAN3Jav.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccAN3Jav.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccAN3Jav.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccAN3Jav.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccAN3Jav.s:18     .text.startup:0000000000000000 main
+     /tmp/ccAN3Jav.s:308    .data:0000000000000000 usart_str
+     /tmp/ccAN3Jav.s:216    .text:0000000000000000 __vector_5
+     /tmp/ccAN3Jav.s:329    .bss:0000000000000004 history
+     /tmp/ccAN3Jav.s:324    .bss:0000000000000002 recent
+     /tmp/ccAN3Jav.s:319    .bss:0000000000000000 period
+
+UNDEFINED SYMBOLS
+uart_init
+__iob
+__udivmodhi4
+printf
+__udivmodsi4
+USARTSendByte
+USARTReceiveByte
+__do_copy_data
+__do_clear_bss

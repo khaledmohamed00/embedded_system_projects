@@ -1,0 +1,152 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.startup,"ax",@progbits
+  11               	.global	main
+  13               	main:
+  14               	.LFB6:
+  15               		.file 1 "main.c"
+   1:main.c        **** #define F_CPU 1000000UL
+   2:main.c        **** #include<avr/io.h>
+   3:main.c        **** #include<util/delay.h>
+   4:main.c        **** #include<avr/interrupt.h>
+   5:main.c        **** //#include"spi.h"
+   6:main.c        **** 
+   7:main.c        **** /*
+   8:main.c        **** int main (void)
+   9:main.c        **** {DDRD=0xff;
+  10:main.c        ****     char data;
+  11:main.c        ****   spi_slave_init();
+  12:main.c        ****   
+  13:main.c        ****     while(1)
+  14:main.c        ****     {
+  15:main.c        ****        
+  16:main.c        ****      PORTD =spi_send_receive(ACK);
+  17:main.c        ****    
+  18:main.c        ****  }
+  19:main.c        **** }
+  20:main.c        **** */
+  21:main.c        **** 
+  22:main.c        **** volatile unsigned char data;
+  23:main.c        **** int main (void)
+  24:main.c        **** {DDRD=0xff;
+  16               		.loc 1 24 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  22               		.loc 1 24 0
+  23 0000 8FEF      		ldi r24,lo8(-1)
+  24 0002 81BB      		out 0x11,r24
+  25:main.c        ****     DDRB &= ~((1<<2)|(1<<3)|(1<<5));   // SCK, MOSI and SS as inputs
+  25               		.loc 1 25 0
+  26 0004 87B3      		in r24,0x17
+  27 0006 837D      		andi r24,lo8(-45)
+  28 0008 87BB      		out 0x17,r24
+  26:main.c        ****     DDRB |= (1<<4);                    // MISO as output
+  29               		.loc 1 26 0
+  30 000a BC9A      		sbi 0x17,4
+  27:main.c        **** 
+  28:main.c        ****     SPCR &= ~(1<<MSTR);                // Set as slave 
+  31               		.loc 1 28 0
+  32 000c 6C98      		cbi 0xd,4
+  29:main.c        ****     SPCR |= (1<<SPR0)|(1<<SPR1);       // divide clock by 128
+  33               		.loc 1 29 0
+  34 000e 8DB1      		in r24,0xd
+  35 0010 8360      		ori r24,lo8(3)
+  36 0012 8DB9      		out 0xd,r24
+  30:main.c        ****     SPCR |=(1<<SPIE);
+  37               		.loc 1 30 0
+  38 0014 6F9A      		sbi 0xd,7
+  31:main.c        ****     SPCR |= (1<<SPE);                   // Enable SPI
+  39               		.loc 1 31 0
+  40 0016 6E9A      		sbi 0xd,6
+  32:main.c        **** 
+  33:main.c        ****     sei();
+  41               		.loc 1 33 0
+  42               	/* #APP */
+  43               	 ;  33 "main.c" 1
+  44 0018 7894      		sei
+  45               	 ;  0 "" 2
+  46               	/* #NOAPP */
+  47               	.L2:
+  34:main.c        **** 
+  35:main.c        ****     while(1)
+  36:main.c        ****     {
+  37:main.c        **** 
+  38:main.c        ****        // ;
+  39:main.c        ****     }
+  48               		.loc 1 39 0
+  49 001a 00C0      		rjmp .L2
+  50               		.cfi_endproc
+  51               	.LFE6:
+  53               		.text
+  54               	.global	__vector_10
+  56               	__vector_10:
+  57               	.LFB7:
+  40:main.c        **** }
+  41:main.c        **** 
+  42:main.c        **** 
+  43:main.c        **** ISR (SPI_STC_vect)
+  44:main.c        **** {
+  58               		.loc 1 44 0
+  59               		.cfi_startproc
+  60 0000 1F92      		push r1
+  61               	.LCFI0:
+  62               		.cfi_def_cfa_offset 3
+  63               		.cfi_offset 1, -2
+  64 0002 0F92      		push r0
+  65               	.LCFI1:
+  66               		.cfi_def_cfa_offset 4
+  67               		.cfi_offset 0, -3
+  68 0004 0FB6      		in r0,__SREG__
+  69 0006 0F92      		push r0
+  70 0008 1124      		clr __zero_reg__
+  71 000a 8F93      		push r24
+  72               	.LCFI2:
+  73               		.cfi_def_cfa_offset 5
+  74               		.cfi_offset 24, -4
+  75               	/* prologue: Signal */
+  76               	/* frame size = 0 */
+  77               	/* stack size = 4 */
+  78               	.L__stack_usage = 4
+  45:main.c        ****   //uint8_t y = SPI_SlaveReceive();
+  46:main.c        ****   PORTD = SPDR;
+  79               		.loc 1 46 0
+  80 000c 8FB1      		in r24,0xf
+  81 000e 82BB      		out 0x12,r24
+  82               	/* epilogue start */
+  47:main.c        **** 
+  48:main.c        **** }
+  83               		.loc 1 48 0
+  84 0010 8F91      		pop r24
+  85 0012 0F90      		pop r0
+  86 0014 0FBE      		out __SREG__,r0
+  87 0016 0F90      		pop r0
+  88 0018 1F90      		pop r1
+  89 001a 1895      		reti
+  90               		.cfi_endproc
+  91               	.LFE7:
+  93               		.comm	data,1,1
+  94               	.Letext0:
+  95               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccxfE2NR.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccxfE2NR.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccxfE2NR.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccxfE2NR.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccxfE2NR.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccxfE2NR.s:13     .text.startup:0000000000000000 main
+     /tmp/ccxfE2NR.s:56     .text:0000000000000000 __vector_10
+                            *COM*:0000000000000001 data
+
+UNDEFINED SYMBOLS
+__do_clear_bss
